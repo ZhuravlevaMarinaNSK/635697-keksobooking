@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Марина Журавлева](https://up.htmlacademy.ru/javascript/14/user/635697).
-* Наставник: `Неизвестно`.
+* Наставник: [Филипп Шамсиев](https://htmlacademy.ru/profile/toolx).
 
 ---
 
