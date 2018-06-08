@@ -46,7 +46,6 @@ var featuresShuffleArray = getShuffle(FEATURES);
 for (var j = 0; j < NUMBER_OF_ADS; j++) {
   var randomX = getRandom(300, 900);
   var randomY = getRandom(130, 630);
-  var randomFeatures = featuresShuffleArray.splice(0, getRandom(1, FEATURES.length));
   ads[j] = {
     author: {
       avatar: 'img/avatars/user0' + avatarShuffleArray[j] + '.png'
@@ -64,7 +63,7 @@ for (var j = 0; j < NUMBER_OF_ADS; j++) {
       guests: getRandom(1, 10),
       checkin: TIMES[getRandom(0, TIMES.length - 1)],
       checkout: TIMES[getRandom(0, TIMES.length - 1)],
-      features: randomFeatures,
+      features: featuresShuffleArray.splice(0, getRandom(1, FEATURES.length)),
       description: ' ',
       photos: photoShuffleArray
     }
@@ -92,21 +91,23 @@ var renderAd = function (ad) {
   adElement.querySelector('.popup__text--capacity').textContent = ad.offer.rooms + ' комнаты для ' + ad.offer.guests + ' гостей';
   adElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + ad.offer.checkin + ', выезд до ' + ad.offer.checkout;
 
-  adElement.querySelector('.popup__features').innerText = '';
-  for (i = 0; i < ad.offer.features.length; i++ ) {
-    var li = document.createElement('li');
-    li.classList.add('popup__feature', 'popup__feature--' + ad.offer.features[i] + '');
-    adElement.querySelector('.popup__features').appendChild(li);
-  }
-
   adElement.querySelector('.popup__photos').innerText = '';
-  for (i = 0; i <= ad.offer.photos.length; i++ ) {
+  for (var k = 0; k < ad.offer.photos.length; k++ ) {
     var element = document.createElement('img');
-    element.setAttribute('src', ad.offer.photos[i]);
+    element.setAttribute('src', ad.offer.photos[k]);
     element.alt = 'фотография жилья';
     element.width = '45';
     element.height = '40';
     adElement.querySelector('.popup__photos').appendChild(element);
+  }
+
+  adElement.querySelector('.popup__features').innerText = '';
+
+  for (var n = 0; n < ad.offer.features.length - 1; n++ ) {
+    var li = document.createElement('li');
+    li.classList.add('popup__feature');
+    li.classList.add('popup__feature--' + ad.offer.features[n]);
+    adElement.querySelector('.popup__features').appendChild(li);
   }
 
   adElement.querySelector('.popup__description').textContent = ad.offer.description;
