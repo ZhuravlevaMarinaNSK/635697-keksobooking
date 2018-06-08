@@ -86,7 +86,8 @@ var renderFeatureList = function (item) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < item.length; i++) {
     var featureItem = document.createElement('li');
-    featureItem.classList.add('popup__feature', 'popup__feature--' + item);
+    featureItem.classList.add('popup__feature');
+    featureItem.classList.add('popup__feature--' + item[i]);
     fragment.appendChild(featureItem);
   }
   return fragment;
