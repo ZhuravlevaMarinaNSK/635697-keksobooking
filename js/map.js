@@ -46,6 +46,7 @@ var featuresShuffleArray = getShuffle(FEATURES);
 for (var j = 0; j < NUMBER_OF_ADS; j++) {
   var randomX = getRandom(300, 900);
   var randomY = getRandom(130, 630);
+  var randomFeatures = featuresShuffleArray.splice(0, getRandom(1, FEATURES.length));
   ads[j] = {
     author: {
       avatar: 'img/avatars/user0' + avatarShuffleArray[j] + '.png'
@@ -63,11 +64,21 @@ for (var j = 0; j < NUMBER_OF_ADS; j++) {
       guests: getRandom(1, 10),
       checkin: TIMES[getRandom(0, TIMES.length - 1)],
       checkout: TIMES[getRandom(0, TIMES.length - 1)],
-      features: featuresShuffleArray.splice(0, getRandom(1, FEATURES.length)),
+      features: randomFeatures,
       description: ' ',
       photos: photoShuffleArray
     }
   }
+}
+
+var getHomeType = function (homeType) {
+  var homeTypes = {
+    'flat': 'Квартира',
+    'palace': 'Дворец',
+    'house': 'Дом',
+    'bungalo': 'Бунгало'
+  }
+  return(homeTypes[homeType]);
 }
 
 var renderAd = function (ad) {
@@ -77,36 +88,28 @@ var renderAd = function (ad) {
   adElement.querySelector('.popup__title').textContent = ad.offer.title;
   adElement.querySelector('.popup__text--address').textContent = ad.offer.address;
   adElement.querySelector('.popup__text--price').textContent = ad.offer.price + ' р/ночь';
-    if (ad.offer.type === 'flat') {
-      adElement.querySelector('.popup__type').textContent = 'Квартира';
-    } else if (ad.offer.type === 'palace') {
-      adElement.querySelector('.popup__type').textContent = 'Дворец';
-    } else if (ad.offer.type === 'house') {
-      adElement.querySelector('.popup__type').textContent = 'Дом';
-    } else if (ad.offer.type === 'bungalo') {
-      adElement.querySelector('.popup__type').textContent = 'Бунгало';
-    }
+  adElement.querySelector('.popup__type').textContent = getHomeType(ad.offer.type);
   adElement.querySelector('.popup__text--capacity').textContent = ad.offer.rooms + ' комнаты для ' + ad.offer.guests + ' гостей';
   adElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + ad.offer.checkin + ', выезд до ' + ad.offer.checkout;
 
-  if (ad.offer.features === 'wifi') {
-    adElement.querySelector('.popup__feature--wifi').cloneNode;
-  } else if (ad.offer.features === 'dishwasher') {
-    adElement.querySelector('.popup__feature--dishwasher').cloneNode;
-  } else if (ad.offer.features === 'parking') {
-    adElement.querySelector('.popup__feature--parking').cloneNode;
-  } else if (ad.offer.features === 'washer') {
-    adElement.querySelector('.popup__feature--washer').cloneNode;
-  } else if (ad.offer.features === 'elevator') {
-    adElement.querySelector('.popup__feature--elevator').cloneNode;
-  } else if (ad.offer.features === 'conditioner') {
-    adElement.querySelector('.popup__feature--conditioner').cloneNode;
+  adElement.querySelector('.popup__features').innerText = '';
+  for (i = 0; i < ad.offer.features.length; i++ ) {
+    var li = document.createElement('li');
+    li.classList.add('popup__feature', 'popup__feature--' + ad.offer.features[i] + '');
+    adElement.querySelector('.popup__features').appendChild(li);
   }
+
+  adElement.querySelector('.popup__photos').innerText = '';
+  for (i = 0; i <= ad.offer.photos.length; i++ ) {
+    var element = document.createElement('img');
+    element.setAttribute('src', ad.offer.photos[i]);
+    element.alt = 'фотография жилья';
+    element.width = '45';
+    element.height = '40';
+    adElement.querySelector('.popup__photos').appendChild(element);
+  }
+
   adElement.querySelector('.popup__description').textContent = ad.offer.description;
-  for (var i = 0; i < PHOTOS.length - 1; i++) {
-    adElement.querySelector('.popup__photos').cloneNode;
-    adElement.querySelector('.popup__photos').src = ad.offer.photos;
-  }
 
   return adElement;
 };
@@ -114,8 +117,8 @@ var renderAd = function (ad) {
 var renderPin = function (ad) {
   var adElement = similarPopupTemplate.querySelector('.map__pin').cloneNode(true);
 
-  adElement.style.left = ad.location.x + 'px';
-  adElement.style.top = ad.location.y + 'px';
+  adElement.style.left = ad.location.x - 20 + 'px';
+  adElement.style.top = ad.location.y - 40 + 'px';
   adElement.querySelector('img').setAttribute('src', ad.author.avatar);
   adElement.querySelector('img').setAttribute('alt', ad.offer.title);
 
@@ -129,7 +132,7 @@ for (var i = 0; i < ads.length; i++) {
   fragmentPin.appendChild(renderPin(ads[i]));
 }
 
-document.querySelector('.map__pin').appendChild(fragmentPin);
+document.querySelector('.map__pins').appendChild(fragmentPin);
 document.querySelector('.map').insertBefore(fragment, document.querySelector('.map').children[4]);
 
 document.querySelector('.map').classList.remove('map--faded');
