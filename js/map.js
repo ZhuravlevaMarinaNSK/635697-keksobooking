@@ -12,6 +12,10 @@ var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.g
 
 var NUMBER_OF_ADS = 8;
 
+var PIN_HEIGHT = 40;
+
+var PIN_WIDTH = 40;
+
 var similarPopupTemplate = document.querySelector('template')
   .content;
 
@@ -25,50 +29,46 @@ function getShuffle(array) {
   var counter = array.length;
   // While there are elements in the array
   while (counter > 0) {
-      // Pick a random index
-      var index = Math.floor(Math.random() * counter);
+    var index = Math.floor(Math.random() * counter);
 
-      // Decrease counter by 1
-      counter--;
+    counter--;
 
-      // And swap the last element with it
-      var temp = array[counter];
-      array[counter] = array[index];
-      array[index] = temp;
+    var temp = array[counter];
+    array[counter] = array[index];
+    array[index] = temp;
   }
   return array;
 }
 
 var avatarShuffleArray = getShuffle([1, 2, 3, 4, 5, 6, 7, 8]);
 var photoShuffleArray = getShuffle(PHOTOS);
-var featuresShuffleArray = getShuffle(FEATURES);
 
-for (var j = 0; j < NUMBER_OF_ADS; j++) {
-  var randomX = getRandom(300, 900);
-  var randomY = getRandom(130, 630);
-  ads[j] = {
-    author: {
-      avatar: 'img/avatars/user0' + avatarShuffleArray[j] + '.png'
-    },
-    location: {
-      x: randomX,
-      y: randomY
-    },
-    offer: {
-      title: TITLES[getRandom(0, TITLES.length - 1)],
-      address: randomX + ', ' + randomY,
-      price: getRandom(1000, 1000000),
-      type: TYPES[getRandom(0, TYPES.length - 1)],
-      rooms: getRandom(1, 5),
-      guests: getRandom(1, 10),
-      checkin: TIMES[getRandom(0, TIMES.length - 1)],
-      checkout: TIMES[getRandom(0, TIMES.length - 1)],
-      features: featuresShuffleArray.splice(0, getRandom(1, FEATURES.length)),
-      description: ' ',
-      photos: photoShuffleArray
-    }
+var createAd = function (nums) {
+  for (var j = 0; j < nums; j++) {
+    ads[j] = {
+      author: {
+        avatar: 'img/avatars/user0' + avatarShuffleArray[j] + '.png'
+      },
+      location: {
+        x: getRandom(300, 900),
+        y: getRandom(130, 630)
+      },
+      offer: {
+        title: TITLES[getRandom(0, TITLES.length - 1)],
+        address: location.x + ', ' + location.y,
+        price: getRandom(1000, 1000000),
+        type: TYPES[getRandom(0, TYPES.length - 1)],
+        rooms: getRandom(1, 5),
+        guests: getRandom(1, 10),
+        checkin: TIMES[getRandom(0, TIMES.length - 1)],
+        checkout: TIMES[getRandom(0, TIMES.length - 1)],
+        features: getShuffle(FEATURES).splice(0, getRandom(1, FEATURES.length)),
+        description: ' ',
+        photos: photoShuffleArray
+      }
+    };
   }
-}
+};
 
 var getHomeType = function (homeType) {
   var homeTypes = {
@@ -76,9 +76,34 @@ var getHomeType = function (homeType) {
     'palace': 'Дворец',
     'house': 'Дом',
     'bungalo': 'Бунгало'
+  };
+  return (homeTypes[homeType]);
+};
+
+createAd(NUMBER_OF_ADS);
+
+var renderFeatureList = function (item) {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < item.length; i++) {
+    var featureItem = document.createElement('li');
+    featureItem.classList.add('popup__feature', 'popup__feature--' + item);
+    fragment.appendChild(featureItem);
   }
-  return(homeTypes[homeType]);
-}
+  return fragment;
+};
+
+var renderPhotoList = function (item) {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < item.length; i++) {
+    var photoFragment = document.createElement('img');
+    photoFragment.setAttribute('src', item[i]);
+    photoFragment.alt = 'фотография жилья';
+    photoFragment.width = '45';
+    photoFragment.height = '40';
+    fragment.appendChild(photoFragment);
+  }
+  return fragment;
+};
 
 var renderAd = function (ad) {
   var adElement = similarPopupTemplate.querySelector('.map__card').cloneNode(true);
@@ -92,23 +117,11 @@ var renderAd = function (ad) {
   adElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + ad.offer.checkin + ', выезд до ' + ad.offer.checkout;
 
   adElement.querySelector('.popup__photos').innerText = '';
-  for (var k = 0; k < ad.offer.photos.length; k++ ) {
-    var element = document.createElement('img');
-    element.setAttribute('src', ad.offer.photos[k]);
-    element.alt = 'фотография жилья';
-    element.width = '45';
-    element.height = '40';
-    adElement.querySelector('.popup__photos').appendChild(element);
-  }
-
   adElement.querySelector('.popup__features').innerText = '';
 
-  for (var n = 0; n < ad.offer.features.length - 1; n++ ) {
-    var li = document.createElement('li');
-    li.classList.add('popup__feature');
-    li.classList.add('popup__feature--' + ad.offer.features[n]);
-    adElement.querySelector('.popup__features').appendChild(li);
-  }
+
+  adElement.querySelector('.popup__features').appendChild(renderFeatureList(ad.offer.features));
+  adElement.querySelector('.popup__photos').appendChild(renderPhotoList(ad.offer.photos));
 
   adElement.querySelector('.popup__description').textContent = ad.offer.description;
 
@@ -118,8 +131,8 @@ var renderAd = function (ad) {
 var renderPin = function (ad) {
   var adElement = similarPopupTemplate.querySelector('.map__pin').cloneNode(true);
 
-  adElement.style.left = ad.location.x - 20 + 'px';
-  adElement.style.top = ad.location.y - 40 + 'px';
+  adElement.style.left = ad.location.x - PIN_WIDTH / 2 + 'px';
+  adElement.style.top = ad.location.y - PIN_HEIGHT + 'px';
   adElement.querySelector('img').setAttribute('src', ad.author.avatar);
   adElement.querySelector('img').setAttribute('alt', ad.offer.title);
 
@@ -128,7 +141,7 @@ var renderPin = function (ad) {
 
 var fragment = document.createDocumentFragment();
 var fragmentPin = document.createDocumentFragment();
-for (var i = 0; i < ads.length; i++) {
+for (var i = 0; i < NUMBER_OF_ADS; i++) {
   fragment.appendChild(renderAd(ads[i]));
   fragmentPin.appendChild(renderPin(ads[i]));
 }
