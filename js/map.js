@@ -45,17 +45,19 @@ var photoShuffleArray = getShuffle(PHOTOS);
 
 var createAd = function (nums) {
   for (var j = 0; j < nums; j++) {
+    var randomX = getRandom(300, 900);
+    var randomY = getRandom(130, 630);
     ads[j] = {
       author: {
         avatar: 'img/avatars/user0' + avatarShuffleArray[j] + '.png'
       },
       location: {
-        x: getRandom(300, 900),
-        y: getRandom(130, 630)
+        x: randomX,
+        y: randomY
       },
       offer: {
         title: TITLES[getRandom(0, TITLES.length - 1)],
-        address: location.x + ', ' + location.y,
+        address: randomX + ', ' + randomY,
         price: getRandom(1000, 1000000),
         type: TYPES[getRandom(0, TYPES.length - 1)],
         rooms: getRandom(1, 5),
@@ -101,6 +103,7 @@ var renderPhotoList = function (item) {
     photoFragment.alt = 'фотография жилья';
     photoFragment.width = '45';
     photoFragment.height = '40';
+    photoFragment.classList.add('popup__photo');
     fragment.appendChild(photoFragment);
   }
   return fragment;
@@ -117,12 +120,14 @@ var renderAd = function (ad) {
   adElement.querySelector('.popup__text--capacity').textContent = ad.offer.rooms + ' комнаты для ' + ad.offer.guests + ' гостей';
   adElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + ad.offer.checkin + ', выезд до ' + ad.offer.checkout;
 
-  adElement.querySelector('.popup__photos').innerText = '';
-  adElement.querySelector('.popup__features').innerText = '';
+  var photosBlock = adElement.querySelector('.popup__photos');
+  var featuresBlock = adElement.querySelector('.popup__features');
 
+  photosBlock.innerText = '';
+  featuresBlock.innerText = '';
 
-  adElement.querySelector('.popup__features').appendChild(renderFeatureList(ad.offer.features));
-  adElement.querySelector('.popup__photos').appendChild(renderPhotoList(ad.offer.photos));
+  featuresBlock.appendChild(renderFeatureList(ad.offer.features));
+  photosBlock.appendChild(renderPhotoList(ad.offer.photos));
 
   adElement.querySelector('.popup__description').textContent = ad.offer.description;
 
@@ -142,8 +147,8 @@ var renderPin = function (ad) {
 
 var fragment = document.createDocumentFragment();
 var fragmentPin = document.createDocumentFragment();
+fragment.appendChild(renderAd(ads[0]));
 for (var i = 0; i < NUMBER_OF_ADS; i++) {
-  fragment.appendChild(renderAd(ads[i]));
   fragmentPin.appendChild(renderPin(ads[i]));
 }
 
