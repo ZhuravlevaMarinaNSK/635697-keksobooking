@@ -25,7 +25,7 @@ var getRandom = function (min, max) {
   return Math.floor(Math.random() * (max + 1 - min) + min);
 };
 
-function getShuffle(array) {
+var getShuffle = function (array) {
   var counter = array.length;
   // While there are elements in the array
   while (counter > 0) {
@@ -38,15 +38,17 @@ function getShuffle(array) {
     array[index] = temp;
   }
   return array;
-}
+};
 
 var avatarShuffleArray = getShuffle([1, 2, 3, 4, 5, 6, 7, 8]);
 var photoShuffleArray = getShuffle(PHOTOS);
+
 
 var createAd = function (nums) {
   for (var j = 0; j < nums; j++) {
     var randomX = getRandom(300, 900);
     var randomY = getRandom(130, 630);
+    var randomFeaturesArray = getShuffle(FEATURES).slice();
     ads[j] = {
       author: {
         avatar: 'img/avatars/user0' + avatarShuffleArray[j] + '.png'
@@ -64,7 +66,7 @@ var createAd = function (nums) {
         guests: getRandom(1, 10),
         checkin: TIMES[getRandom(0, TIMES.length - 1)],
         checkout: TIMES[getRandom(0, TIMES.length - 1)],
-        features: getShuffle(FEATURES).splice(0, getRandom(1, FEATURES.length)),
+        features: randomFeaturesArray.splice(0, getRandom(1, FEATURES.length)),
         description: ' ',
         photos: photoShuffleArray
       }
@@ -148,6 +150,7 @@ var renderPin = function (ad) {
 var fragment = document.createDocumentFragment();
 var fragmentPin = document.createDocumentFragment();
 fragment.appendChild(renderAd(ads[0]));
+
 for (var i = 0; i < NUMBER_OF_ADS; i++) {
   fragmentPin.appendChild(renderPin(ads[i]));
 }
