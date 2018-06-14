@@ -39,7 +39,7 @@ var getShuffle = function (array) {
   }
   return array;
 };
-
+var map = document.querySelector('.map');
 var avatarShuffleArray = getShuffle([1, 2, 3, 4, 5, 6, 7, 8]);
 var photoShuffleArray = getShuffle(PHOTOS);
 
@@ -114,6 +114,7 @@ var renderPhotoList = function (item) {
 var renderAd = function (ad) {
   var adElement = similarPopupTemplate.querySelector('.map__card').cloneNode(true);
 
+  adElement.classList.add('popup');
   adElement.querySelector('img').setAttribute('src', ad.author.avatar);
   adElement.querySelector('.popup__title').textContent = ad.offer.title;
   adElement.querySelector('.popup__text--address').textContent = ad.offer.address;
@@ -139,6 +140,7 @@ var renderAd = function (ad) {
 var renderPin = function (ad) {
   var adElement = similarPopupTemplate.querySelector('.map__pin').cloneNode(true);
 
+  adElement.classList.add('map__pin');
   adElement.style.left = ad.location.x - PIN_WIDTH / 2 + 'px';
   adElement.style.top = ad.location.y - PIN_HEIGHT + 'px';
   adElement.querySelector('img').setAttribute('src', ad.author.avatar);
@@ -147,15 +149,107 @@ var renderPin = function (ad) {
   return adElement;
 };
 
+
+var getOffset = function (elem) {
+  if (elem.getBoundingClientRect) {
+    // "правильный" вариант
+    return getOffsetRect(elem);
+  } else {
+    // пусть работает хоть как-то
+    return getOffsetSum(elem);
+  }
+};
+
+var getOffsetSum = function (elem) {
+  var top = 0;
+  var left = 0;
+  while (elem) {
+    top = top + parseInt(elem.offsetTop, 10);
+    left = left + parseInt(elem.offsetLeft, 10);
+    elem = elem.offsetParent;
+  }
+  var coordinates = top + ', ' + left;
+  return coordinates;
+};
+
+var getOffsetRect = function (elem) {
+  // (1)
+  var box = elem.getBoundingClientRect();
+
+  // (2)
+  var body = document.body;
+  var docElem = document.documentElement;
+
+  // (3)
+  var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+  var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
+
+  // (4)
+  var clientTop = docElem.clientTop || body.clientTop || 0;
+  var clientLeft = docElem.clientLeft || body.clientLeft || 0;
+
+  // (5)
+  var top = box.top + scrollTop - clientTop;
+  var left = box.left + scrollLeft - clientLeft;
+  var coordinates = Math.round(top) + ', ' + Math.round(left);
+
+  return coordinates;
+};
+
+
 var fragment = document.createDocumentFragment();
 var fragmentPin = document.createDocumentFragment();
-fragment.appendChild(renderAd(ads[0]));
 
 for (var i = 0; i < NUMBER_OF_ADS; i++) {
   fragmentPin.appendChild(renderPin(ads[i]));
 }
 
-document.querySelector('.map__pins').appendChild(fragmentPin);
-document.querySelector('.map').insertBefore(fragment, document.querySelector('.map').children[4]);
 
-document.querySelector('.map').classList.remove('map--faded');
+var closePopup = function () {
+  var popup = map.querySelector('.popup');
+  var popupClose = map.querySelector('.popup__close');
+  popupClose.addEventListener('click', closePopup);
+
+  popup.classList.add('hidden');
+};
+
+
+var onMapPinClick = function (evt) {
+  var target = evt.target;
+  if (target.classList.contains('map__pin')) {
+    fragment.appendChild(renderAd(ads[0]));
+  }
+};
+
+map.addEventListener('click', onMapPinClick);
+
+var adForm = document.querySelector('.ad-form');
+var mainPin = map.querySelector('.map__pin--main');
+var adFormFieldsets = adForm.querySelectorAll('fieldset');
+
+var toggleMapFormDisable = function (isDisabled) {
+  map.classList.toggle('map--faded', isDisabled);
+  adForm.classList.toggle('ad-form--disabled', isDisabled);
+
+  for (var k = 0; k < adFormFieldsets.length; k++) {
+    adFormFieldsets[k].disabled = isDisabled;
+  }
+};
+
+toggleMapFormDisable(true);
+
+var getMainPinPosition = function () {
+  var coordinates = getOffset(mainPin);
+  adForm.querySelector('#address').value = coordinates;
+};
+
+getMainPinPosition();
+
+var onMainPinClick = function () {
+  toggleMapFormDisable(false);
+  mainPin.removeEventListener('mouseup', onMainPinClick);
+  document.querySelector('.map__pins').appendChild(fragmentPin);
+  map.insertBefore(fragment, document.querySelector('.map').children[4]);
+};
+
+mainPin.addEventListener('mouseup', onMainPinClick);
