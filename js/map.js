@@ -16,6 +16,9 @@ var PIN_HEIGHT = 40;
 
 var PIN_WIDTH = 40;
 
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
 var similarPopupTemplate = document.querySelector('template')
   .content;
 
@@ -39,6 +42,7 @@ var getShuffle = function (array) {
   }
   return array;
 };
+
 var map = document.querySelector('.map');
 var avatarShuffleArray = getShuffle([1, 2, 3, 4, 5, 6, 7, 8]);
 var photoShuffleArray = getShuffle(PHOTOS);
@@ -111,33 +115,6 @@ var renderPhotoList = function (item) {
   return fragment;
 };
 
-var renderAd = function (ad) {
-  var adElement = similarPopupTemplate.querySelector('.map__card').cloneNode(true);
-
-  adElement.classList.add('popup');
-  adElement.classList.add('hidden');
-  adElement.querySelector('img').setAttribute('src', ad.author.avatar);
-  adElement.querySelector('.popup__title').textContent = ad.offer.title;
-  adElement.querySelector('.popup__text--address').textContent = ad.offer.address;
-  adElement.querySelector('.popup__text--price').textContent = ad.offer.price + ' р/ночь';
-  adElement.querySelector('.popup__type').textContent = getHomeType(ad.offer.type);
-  adElement.querySelector('.popup__text--capacity').textContent = ad.offer.rooms + ' комнаты для ' + ad.offer.guests + ' гостей';
-  adElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + ad.offer.checkin + ', выезд до ' + ad.offer.checkout;
-
-  var photosBlock = adElement.querySelector('.popup__photos');
-  var featuresBlock = adElement.querySelector('.popup__features');
-
-  photosBlock.innerText = '';
-  featuresBlock.innerText = '';
-
-  featuresBlock.appendChild(renderFeatureList(ad.offer.features));
-  photosBlock.appendChild(renderPhotoList(ad.offer.photos));
-
-  adElement.querySelector('.popup__description').textContent = ad.offer.description;
-
-  return adElement;
-};
-
 var renderPin = function (ad) {
   var adElement = similarPopupTemplate.querySelector('.map__pin').cloneNode(true);
 
@@ -150,6 +127,14 @@ var renderPin = function (ad) {
   return adElement;
 };
 
+var createPins = function (quantity) {
+  var fragmentPin = document.createDocumentFragment();
+
+  for (var i = 0; i < quantity; i++) {
+    fragmentPin.appendChild(renderPin(ads[i]));
+  }
+  document.querySelector('.map__pins').appendChild(fragmentPin);
+};
 
 var getOffset = function (elem) {
   if (elem.getBoundingClientRect) {
@@ -197,16 +182,6 @@ var getOffsetRect = function (elem) {
   return coordinates;
 };
 
-
-var fragment = document.createDocumentFragment();
-var fragmentPin = document.createDocumentFragment();
-
-for (var i = 0; i < NUMBER_OF_ADS; i++) {
-  fragmentPin.appendChild(renderPin(ads[i]));
-  fragment.appendChild(renderAd(ads[0]));
-}
-
-
 var adForm = document.querySelector('.ad-form');
 var mainPin = map.querySelector('.map__pin--main');
 var adFormFieldsets = adForm.querySelectorAll('fieldset');
@@ -232,38 +207,73 @@ getMainPinPosition();
 var onMainPinClick = function () {
   toggleMapFormDisable(false);
   mainPin.removeEventListener('mouseup', onMainPinClick);
-  document.querySelector('.map__pins').appendChild(fragmentPin);
-  map.insertBefore(fragment, document.querySelector('.map').children[4]);
+  createPins(NUMBER_OF_ADS);
 };
 
 mainPin.addEventListener('mouseup', onMainPinClick);
 
+var onPopupCloseEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    closePopup();
+  }
+};
 
-var onMapPinClick = function (evt) {
-  var target = evt.target;
-  var popups = map.querySelectorAll('.popup');
-  if (target.classList.contains('map__pin')) {
-
-    return showCard(popups);
-  } else {
-    return console.log('не то');
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup();
   }
 };
 
 var closePopup = function () {
   var popups = map.querySelectorAll('.popup');
+  var popupClose = document.querySelector('.map__card').querySelector('.popup__close');
   for (var n = 0; n < popups.length; n++) {
     popups[n].classList.add('hidden');
   }
+  document.removeEventListener('keydown', onPopupEscPress);
+  popupClose.removeEventListener('click', closePopup);
+  popupClose.removeEventListener('keydown', onPopupCloseEnterPress);
 };
 
-var showCard = function (array) {
-  var counter = array.length - 1;
-  var shownEl = array[getRandom(0, counter)].classList.remove('hidden');
+var renderAd = function (ad) {
+  var adElement = similarPopupTemplate.querySelector('.map__card').cloneNode(true);
 
-  return shownEl;
+  adElement.classList.add('popup');
+  adElement.classList.add('hidden');
+  adElement.querySelector('img').setAttribute('src', ad.author.avatar);
+  adElement.querySelector('.popup__title').textContent = ad.offer.title;
+  adElement.querySelector('.popup__text--address').textContent = ad.offer.address;
+  adElement.querySelector('.popup__text--price').textContent = ad.offer.price + ' р/ночь';
+  adElement.querySelector('.popup__type').textContent = getHomeType(ad.offer.type);
+  adElement.querySelector('.popup__text--capacity').textContent = ad.offer.rooms + ' комнаты для ' + ad.offer.guests + ' гостей';
+  adElement.querySelector('.popup__text--time').textContent = 'Заезд после ' + ad.offer.checkin + ', выезд до ' + ad.offer.checkout;
+
+  var photosBlock = adElement.querySelector('.popup__photos');
+  var featuresBlock = adElement.querySelector('.popup__features');
+
+  photosBlock.innerText = '';
+  featuresBlock.innerText = '';
+
+  featuresBlock.appendChild(renderFeatureList(ad.offer.features));
+  photosBlock.appendChild(renderPhotoList(ad.offer.photos));
+
+  adElement.querySelector('.popup__description').textContent = ad.offer.description;
+
+  var popupClose = document.querySelector('.map__card').querySelector('.popup__close');
+  popupClose.addEventListener('click', closePopup);
+  popupClose.addEventListener('keydown', onPopupCloseEnterPress);
+  document.addEventListener('keydown', onPopupEscPress);
+
+  return adElement;
 };
 
-map.addEventListener('click', onMapPinClick);
-var popupClose = map.querySelector('.popup__close');
-popupClose.addEventListener('click', closePopup);
+var createMapCards = function (quantity) {
+  var cards = [];
+  for (var i = 0; i < quantity; i++) {
+    cards[i] = renderAd(ads[i]);
+    document.querySelector('.map').insertBefore(renderAd(cards[i]), document.querySelector('.map'). children[4]);
+  }
+  return cards;
+};
+
+createMapCards(NUMBER_OF_ADS);
