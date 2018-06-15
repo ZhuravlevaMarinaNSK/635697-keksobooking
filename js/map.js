@@ -115,6 +115,7 @@ var renderAd = function (ad) {
   var adElement = similarPopupTemplate.querySelector('.map__card').cloneNode(true);
 
   adElement.classList.add('popup');
+  adElement.classList.add('hidden');
   adElement.querySelector('img').setAttribute('src', ad.author.avatar);
   adElement.querySelector('.popup__title').textContent = ad.offer.title;
   adElement.querySelector('.popup__text--address').textContent = ad.offer.address;
@@ -202,26 +203,9 @@ var fragmentPin = document.createDocumentFragment();
 
 for (var i = 0; i < NUMBER_OF_ADS; i++) {
   fragmentPin.appendChild(renderPin(ads[i]));
+  fragment.appendChild(renderAd(ads[0]));
 }
 
-
-var closePopup = function () {
-  var popup = map.querySelector('.popup');
-  var popupClose = map.querySelector('.popup__close');
-  popupClose.addEventListener('click', closePopup);
-
-  popup.classList.add('hidden');
-};
-
-
-var onMapPinClick = function (evt) {
-  var target = evt.target;
-  if (target.classList.contains('map__pin')) {
-    fragment.appendChild(renderAd(ads[0]));
-  }
-};
-
-map.addEventListener('click', onMapPinClick);
 
 var adForm = document.querySelector('.ad-form');
 var mainPin = map.querySelector('.map__pin--main');
@@ -253,3 +237,19 @@ var onMainPinClick = function () {
 };
 
 mainPin.addEventListener('mouseup', onMainPinClick);
+
+var onMapPinClick = function (evt) {
+  var target = evt.target;
+  var popups = map.querySelectorAll('.popup');
+  if (target.classList.contains('map__pin')) {
+    for (var k = 0; k < popups.length; k++) {
+      var closePopup = popups[k].classList.add('hidden');
+      var popupClose = map.querySelector('.popup__close');
+      popups[k].classList.remove('hidden');
+      popupClose.addEventListener('click', closePopup);
+    }
+  }
+  return popups;
+};
+
+map.addEventListener('click', onMapPinClick);
