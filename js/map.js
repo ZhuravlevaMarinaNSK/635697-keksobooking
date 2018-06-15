@@ -238,18 +238,32 @@ var onMainPinClick = function () {
 
 mainPin.addEventListener('mouseup', onMainPinClick);
 
+
 var onMapPinClick = function (evt) {
   var target = evt.target;
   var popups = map.querySelectorAll('.popup');
   if (target.classList.contains('map__pin')) {
-    for (var k = 0; k < popups.length; k++) {
-      var closePopup = popups[k].classList.add('hidden');
-      var popupClose = map.querySelector('.popup__close');
-      popups[k].classList.remove('hidden');
-      popupClose.addEventListener('click', closePopup);
-    }
+
+    return showCard(popups);
+  } else {
+    return console.log('не то');
   }
-  return popups;
+};
+
+var closePopup = function () {
+  var popups = map.querySelectorAll('.popup');
+  for (var n = 0; n < popups.length; n++) {
+    popups[n].classList.add('hidden');
+  }
+};
+
+var showCard = function (array) {
+  var counter = array.length - 1;
+  var shownEl = array[getRandom(0, counter)].classList.remove('hidden');
+
+  return shownEl;
 };
 
 map.addEventListener('click', onMapPinClick);
+var popupClose = map.querySelector('.popup__close');
+popupClose.addEventListener('click', closePopup);
