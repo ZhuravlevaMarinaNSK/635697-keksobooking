@@ -22,8 +22,6 @@ var ENTER_KEYCODE = 13;
 var similarPopupTemplate = document.querySelector('template')
   .content;
 
-var ads = [];
-
 var getRandom = function (min, max) {
   return Math.floor(Math.random() * (max + 1 - min) + min);
 };
@@ -44,38 +42,36 @@ var getShuffle = function (array) {
 };
 
 var map = document.querySelector('.map');
-var avatarShuffleArray = getShuffle([1, 2, 3, 4, 5, 6, 7, 8]);
 var photoShuffleArray = getShuffle(PHOTOS);
 
 
 var createAd = function (nums) {
-  for (var j = 0; j < nums; j++) {
-    var randomX = getRandom(300, 900);
-    var randomY = getRandom(130, 630);
-    var randomFeaturesArray = getShuffle(FEATURES).slice();
-    ads[j] = {
-      author: {
-        avatar: 'img/avatars/user0' + avatarShuffleArray[j] + '.png'
-      },
-      location: {
-        x: randomX,
-        y: randomY
-      },
-      offer: {
-        title: TITLES[getRandom(0, TITLES.length - 1)],
-        address: randomX + ', ' + randomY,
-        price: getRandom(1000, 1000000),
-        type: TYPES[getRandom(0, TYPES.length - 1)],
-        rooms: getRandom(1, 5),
-        guests: getRandom(1, 10),
-        checkin: TIMES[getRandom(0, TIMES.length - 1)],
-        checkout: TIMES[getRandom(0, TIMES.length - 1)],
-        features: randomFeaturesArray.splice(0, getRandom(1, FEATURES.length)),
-        description: ' ',
-        photos: photoShuffleArray
-      }
-    };
-  }
+  var randomX = getRandom(300, 900);
+  var randomY = getRandom(130, 630);
+  var randomFeaturesArray = getShuffle(FEATURES).slice();
+  var ads = {
+    author: {
+      avatar: 'img/avatars/user0' + (nums + 1) + '.png'
+    },
+    location: {
+      x: randomX,
+      y: randomY
+    },
+    offer: {
+      title: TITLES[getRandom(0, TITLES.length - 1)],
+      address: randomX + ', ' + randomY,
+      price: getRandom(1000, 1000000),
+      type: TYPES[getRandom(0, TYPES.length - 1)],
+      rooms: getRandom(1, 5),
+      guests: getRandom(1, 10),
+      checkin: TIMES[getRandom(0, TIMES.length - 1)],
+      checkout: TIMES[getRandom(0, TIMES.length - 1)],
+      features: randomFeaturesArray.splice(0, getRandom(1, FEATURES.length)),
+      description: ' ',
+      photos: photoShuffleArray
+    }
+  };
+  return ads;
 };
 
 var getHomeType = function (homeType) {
@@ -87,8 +83,6 @@ var getHomeType = function (homeType) {
   };
   return (homeTypes[homeType]);
 };
-
-createAd(NUMBER_OF_ADS);
 
 var renderFeatureList = function (item) {
   var fragment = document.createDocumentFragment();
@@ -115,14 +109,20 @@ var renderPhotoList = function (item) {
   return fragment;
 };
 
-var renderPin = function (ad) {
+var renderPin = function (ad, number) {
   var adElement = similarPopupTemplate.querySelector('.map__pin').cloneNode(true);
 
   adElement.classList.add('map__pin');
   adElement.style.left = ad.location.x - PIN_WIDTH / 2 + 'px';
   adElement.style.top = ad.location.y - PIN_HEIGHT + 'px';
+  adElement.setAttribute('data-id', number);
+
   adElement.querySelector('img').setAttribute('src', ad.author.avatar);
   adElement.querySelector('img').setAttribute('alt', ad.offer.title);
+
+  adElement.addEventListener('click', function () {
+    showCard(document.querySelector('.map'), cards[number]);
+  });
 
   return adElement;
 };
@@ -130,8 +130,8 @@ var renderPin = function (ad) {
 var createPins = function (quantity) {
   var fragmentPin = document.createDocumentFragment();
 
-  for (var i = 0; i < quantity; i++) {
-    fragmentPin.appendChild(renderPin(ads[i]));
+  for (var i = 0; i < quantity.length; i++) {
+    fragmentPin.appendChild(renderPin(quantity[i], i));
   }
   document.querySelector('.map__pins').appendChild(fragmentPin);
 };
@@ -207,7 +207,7 @@ getMainPinPosition();
 var onMainPinClick = function () {
   toggleMapFormDisable(false);
   mainPin.removeEventListener('mouseup', onMainPinClick);
-  createPins(NUMBER_OF_ADS);
+  createPins(cards);
 };
 
 mainPin.addEventListener('mouseup', onMainPinClick);
@@ -225,11 +225,9 @@ var onPopupEscPress = function (evt) {
 };
 
 var closePopup = function () {
-  var popups = map.querySelectorAll('.popup');
-  var popupClose = document.querySelector('.map__card').querySelector('.popup__close');
-  for (var n = 0; n < popups.length; n++) {
-    popups[n].classList.add('hidden');
-  }
+  var popup = map.querySelector('.popup');
+  var popupClose = document.querySelector('.popup__close');
+  map.removeChild(popup);
   document.removeEventListener('keydown', onPopupEscPress);
   popupClose.removeEventListener('click', closePopup);
   popupClose.removeEventListener('keydown', onPopupCloseEnterPress);
@@ -239,7 +237,6 @@ var renderAd = function (ad) {
   var adElement = similarPopupTemplate.querySelector('.map__card').cloneNode(true);
 
   adElement.classList.add('popup');
-  adElement.classList.add('hidden');
   adElement.querySelector('img').setAttribute('src', ad.author.avatar);
   adElement.querySelector('.popup__title').textContent = ad.offer.title;
   adElement.querySelector('.popup__text--address').textContent = ad.offer.address;
@@ -259,21 +256,28 @@ var renderAd = function (ad) {
 
   adElement.querySelector('.popup__description').textContent = ad.offer.description;
 
-  var popupClose = document.querySelector('.map__card').querySelector('.popup__close');
-  popupClose.addEventListener('click', closePopup);
-  popupClose.addEventListener('keydown', onPopupCloseEnterPress);
-  document.addEventListener('keydown', onPopupEscPress);
-
   return adElement;
 };
 
 var createMapCards = function (quantity) {
   var cards = [];
   for (var i = 0; i < quantity; i++) {
-    cards[i] = renderAd(ads[i]);
-    document.querySelector('.map').insertBefore(renderAd(cards[i]), document.querySelector('.map'). children[4]);
+    cards[i] = createAd(i);
   }
   return cards;
 };
 
-createMapCards(NUMBER_OF_ADS);
+var cards = createMapCards(NUMBER_OF_ADS);
+
+var showCard = function (div, card) {
+  var mapCard = div.querySelector('.map__card');
+  if (mapCard) {
+    closePopup();
+  }
+  div.insertBefore(renderAd(card), div.children[4]);
+
+  var popupClose = map.querySelector('.popup__close');
+  popupClose.addEventListener('click', closePopup);
+  popupClose.addEventListener('keydown', onPopupCloseEnterPress);
+  document.addEventListener('keydown', onPopupEscPress);
+};
