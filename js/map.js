@@ -16,10 +16,8 @@ var PIN_HEIGHT = 40;
 
 var PIN_WIDTH = 40;
 
-var similarPopupTemplate = document.querySelector('template')
-  .content;
-
-var ads = [];
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
 
 var getRandom = function (min, max) {
   return Math.floor(Math.random() * (max + 1 - min) + min);
@@ -40,38 +38,44 @@ var getShuffle = function (array) {
   return array;
 };
 
-var avatarShuffleArray = getShuffle([1, 2, 3, 4, 5, 6, 7, 8]);
+var map = document.querySelector('.map');
+var similarPopupTemplate = document.querySelector('template')
+  .content;
+
+var adForm = document.querySelector('.ad-form');
+var mainPin = map.querySelector('.map__pin--main');
+var adFormFieldsets = adForm.querySelectorAll('fieldset');
+
+
 var photoShuffleArray = getShuffle(PHOTOS);
 
-
 var createAd = function (nums) {
-  for (var j = 0; j < nums; j++) {
-    var randomX = getRandom(300, 900);
-    var randomY = getRandom(130, 630);
-    var randomFeaturesArray = getShuffle(FEATURES).slice();
-    ads[j] = {
-      author: {
-        avatar: 'img/avatars/user0' + avatarShuffleArray[j] + '.png'
-      },
-      location: {
-        x: randomX,
-        y: randomY
-      },
-      offer: {
-        title: TITLES[getRandom(0, TITLES.length - 1)],
-        address: randomX + ', ' + randomY,
-        price: getRandom(1000, 1000000),
-        type: TYPES[getRandom(0, TYPES.length - 1)],
-        rooms: getRandom(1, 5),
-        guests: getRandom(1, 10),
-        checkin: TIMES[getRandom(0, TIMES.length - 1)],
-        checkout: TIMES[getRandom(0, TIMES.length - 1)],
-        features: randomFeaturesArray.splice(0, getRandom(1, FEATURES.length)),
-        description: ' ',
-        photos: photoShuffleArray
-      }
-    };
-  }
+  var randomX = getRandom(300, 900);
+  var randomY = getRandom(130, 630);
+  var randomFeaturesArray = getShuffle(FEATURES).slice();
+  var ads = {
+    author: {
+      avatar: 'img/avatars/user0' + (nums + 1) + '.png'
+    },
+    location: {
+      x: randomX,
+      y: randomY
+    },
+    offer: {
+      title: TITLES[getRandom(0, TITLES.length - 1)],
+      address: randomX + ', ' + randomY,
+      price: getRandom(1000, 1000000),
+      type: TYPES[getRandom(0, TYPES.length - 1)],
+      rooms: getRandom(1, 5),
+      guests: getRandom(1, 10),
+      checkin: TIMES[getRandom(0, TIMES.length - 1)],
+      checkout: TIMES[getRandom(0, TIMES.length - 1)],
+      features: randomFeaturesArray.splice(0, getRandom(1, FEATURES.length)),
+      description: ' ',
+      photos: photoShuffleArray
+    }
+  };
+  return ads;
 };
 
 var getHomeType = function (homeType) {
@@ -83,8 +87,6 @@ var getHomeType = function (homeType) {
   };
   return (homeTypes[homeType]);
 };
-
-createAd(NUMBER_OF_ADS);
 
 var renderFeatureList = function (item) {
   var fragment = document.createDocumentFragment();
@@ -111,9 +113,87 @@ var renderPhotoList = function (item) {
   return fragment;
 };
 
+var renderPin = function (ad, number) {
+  var adElement = similarPopupTemplate.querySelector('.map__pin').cloneNode(true);
+
+  adElement.classList.add('map__pin');
+  adElement.style.left = ad.location.x - PIN_WIDTH / 2 + 'px';
+  adElement.style.top = ad.location.y - PIN_HEIGHT + 'px';
+  adElement.setAttribute('data-id', number);
+
+  adElement.querySelector('img').setAttribute('src', ad.author.avatar);
+  adElement.querySelector('img').setAttribute('alt', ad.offer.title);
+
+  adElement.addEventListener('click', function () {
+    showCard(document.querySelector('.map'), cards[number]);
+  });
+
+  return adElement;
+};
+
+var getMainPinPosition = function () {
+  var top = mainPin.offsetTop + PIN_HEIGHT;
+  var left = mainPin.offsetLeft + PIN_WIDTH / 2;
+  var coordinates = top + ', ' + left;
+  adForm.querySelector('#address').value = coordinates;
+};
+
+var createPins = function (ads) {
+  var fragmentPin = document.createDocumentFragment();
+
+  for (var i = 0; i < ads.length; i++) {
+    fragmentPin.appendChild(renderPin(ads[i], i));
+  }
+  document.querySelector('.map__pins').appendChild(fragmentPin);
+};
+
+var toggleMapFormDisable = function (isDisabled) {
+  map.classList.toggle('map--faded', isDisabled);
+  adForm.classList.toggle('ad-form--disabled', isDisabled);
+
+  for (var k = 0; k < adFormFieldsets.length; k++) {
+    adFormFieldsets[k].disabled = isDisabled;
+  }
+
+  getMainPinPosition();
+};
+
+toggleMapFormDisable(true);
+
+
+var onMainPinClick = function () {
+  toggleMapFormDisable(false);
+  mainPin.removeEventListener('mouseup', onMainPinClick);
+  createPins(cards);
+};
+
+mainPin.addEventListener('mouseup', onMainPinClick);
+
+var onPopupCloseEnterPress = function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    closePopup();
+  }
+};
+
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup();
+  }
+};
+
+var closePopup = function () {
+  var popup = map.querySelector('.popup');
+  var popupClose = document.querySelector('.popup__close');
+  map.removeChild(popup);
+  document.removeEventListener('keydown', onPopupEscPress);
+  popupClose.removeEventListener('click', closePopup);
+  popupClose.removeEventListener('keydown', onPopupCloseEnterPress);
+};
+
 var renderAd = function (ad) {
   var adElement = similarPopupTemplate.querySelector('.map__card').cloneNode(true);
 
+  adElement.classList.add('popup');
   adElement.querySelector('img').setAttribute('src', ad.author.avatar);
   adElement.querySelector('.popup__title').textContent = ad.offer.title;
   adElement.querySelector('.popup__text--address').textContent = ad.offer.address;
@@ -136,26 +216,25 @@ var renderAd = function (ad) {
   return adElement;
 };
 
-var renderPin = function (ad) {
-  var adElement = similarPopupTemplate.querySelector('.map__pin').cloneNode(true);
-
-  adElement.style.left = ad.location.x - PIN_WIDTH / 2 + 'px';
-  adElement.style.top = ad.location.y - PIN_HEIGHT + 'px';
-  adElement.querySelector('img').setAttribute('src', ad.author.avatar);
-  adElement.querySelector('img').setAttribute('alt', ad.offer.title);
-
-  return adElement;
+var createMapCards = function (quantity) {
+  var cards = [];
+  for (var i = 0; i < quantity; i++) {
+    cards[i] = createAd(i);
+  }
+  return cards;
 };
 
-var fragment = document.createDocumentFragment();
-var fragmentPin = document.createDocumentFragment();
-fragment.appendChild(renderAd(ads[0]));
+var cards = createMapCards(NUMBER_OF_ADS);
 
-for (var i = 0; i < NUMBER_OF_ADS; i++) {
-  fragmentPin.appendChild(renderPin(ads[i]));
-}
+var showCard = function (div, card) {
+  var mapCard = div.querySelector('.map__card');
+  if (mapCard) {
+    closePopup();
+  }
+  div.insertBefore(renderAd(card), div.children[4]);
 
-document.querySelector('.map__pins').appendChild(fragmentPin);
-document.querySelector('.map').insertBefore(fragment, document.querySelector('.map').children[4]);
-
-document.querySelector('.map').classList.remove('map--faded');
+  var popupClose = map.querySelector('.popup__close');
+  popupClose.addEventListener('click', closePopup);
+  popupClose.addEventListener('keydown', onPopupCloseEnterPress);
+  document.addEventListener('keydown', onPopupEscPress);
+};
