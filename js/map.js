@@ -19,9 +19,6 @@ var PIN_WIDTH = 40;
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
 
-var similarPopupTemplate = document.querySelector('template')
-  .content;
-
 var getRandom = function (min, max) {
   return Math.floor(Math.random() * (max + 1 - min) + min);
 };
@@ -42,8 +39,15 @@ var getShuffle = function (array) {
 };
 
 var map = document.querySelector('.map');
-var photoShuffleArray = getShuffle(PHOTOS);
+var similarPopupTemplate = document.querySelector('template')
+  .content;
 
+var adForm = document.querySelector('.ad-form');
+var mainPin = map.querySelector('.map__pin--main');
+var adFormFieldsets = adForm.querySelectorAll('fieldset');
+
+
+var photoShuffleArray = getShuffle(PHOTOS);
 
 var createAd = function (nums) {
   var randomX = getRandom(300, 900);
@@ -127,64 +131,21 @@ var renderPin = function (ad, number) {
   return adElement;
 };
 
-var createPins = function (quantity) {
+var getMainPinPosition = function () {
+  var top = mainPin.offsetTop + PIN_HEIGHT;
+  var left = mainPin.offsetLeft + PIN_WIDTH / 2;
+  var coordinates = top + ', ' + left;
+  adForm.querySelector('#address').value = coordinates;
+};
+
+var createPins = function (ads) {
   var fragmentPin = document.createDocumentFragment();
 
-  for (var i = 0; i < quantity.length; i++) {
-    fragmentPin.appendChild(renderPin(quantity[i], i));
+  for (var i = 0; i < ads.length; i++) {
+    fragmentPin.appendChild(renderPin(ads[i], i));
   }
   document.querySelector('.map__pins').appendChild(fragmentPin);
 };
-
-var getOffset = function (elem) {
-  if (elem.getBoundingClientRect) {
-    // "правильный" вариант
-    return getOffsetRect(elem);
-  } else {
-    // пусть работает хоть как-то
-    return getOffsetSum(elem);
-  }
-};
-
-var getOffsetSum = function (elem) {
-  var top = 0;
-  var left = 0;
-  while (elem) {
-    top = top + parseInt(elem.offsetTop, 10);
-    left = left + parseInt(elem.offsetLeft, 10);
-    elem = elem.offsetParent;
-  }
-  var coordinates = top + ', ' + left;
-  return coordinates;
-};
-
-var getOffsetRect = function (elem) {
-  // (1)
-  var box = elem.getBoundingClientRect();
-
-  // (2)
-  var body = document.body;
-  var docElem = document.documentElement;
-
-  // (3)
-  var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
-  var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
-
-  // (4)
-  var clientTop = docElem.clientTop || body.clientTop || 0;
-  var clientLeft = docElem.clientLeft || body.clientLeft || 0;
-
-  // (5)
-  var top = box.top + scrollTop - clientTop;
-  var left = box.left + scrollLeft - clientLeft;
-  var coordinates = Math.round(top) + ', ' + Math.round(left);
-
-  return coordinates;
-};
-
-var adForm = document.querySelector('.ad-form');
-var mainPin = map.querySelector('.map__pin--main');
-var adFormFieldsets = adForm.querySelectorAll('fieldset');
 
 var toggleMapFormDisable = function (isDisabled) {
   map.classList.toggle('map--faded', isDisabled);
@@ -193,16 +154,12 @@ var toggleMapFormDisable = function (isDisabled) {
   for (var k = 0; k < adFormFieldsets.length; k++) {
     adFormFieldsets[k].disabled = isDisabled;
   }
+
+  getMainPinPosition();
 };
 
 toggleMapFormDisable(true);
 
-var getMainPinPosition = function () {
-  var coordinates = getOffset(mainPin);
-  adForm.querySelector('#address').value = coordinates;
-};
-
-getMainPinPosition();
 
 var onMainPinClick = function () {
   toggleMapFormDisable(false);
