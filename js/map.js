@@ -238,3 +238,123 @@ var showCard = function (div, card) {
   popupClose.addEventListener('keydown', onPopupCloseEnterPress);
   document.addEventListener('keydown', onPopupEscPress);
 };
+
+var roomNumberInput = document.querySelector('#room_number');
+var guestNumberInput = document.querySelector('#capacity');
+
+var checkGuestsRooms = function () {
+  for (var i = 0; i < guestNumberInput.options.length; i++) {
+    var option = guestNumberInput.options[i];
+    option.disabled = false;
+    if (roomNumberInput.value == 1) {
+      if (option.value == 3 || option.value == 2) {
+        guestNumberInput.setCustomValidity('Количество гостей не соответствует количеству комнат');
+        option.disabled = true;
+      } else {
+        option.disabled = false;
+      }
+    } else if (roomNumberInput.value == 2) {
+      if (option.value == 3) {
+        guestNumberInput.setCustomValidity('Количество гостей не соответствует количеству комнат');
+        option.disabled = true;
+      } else {
+        option.disabled = false;
+      }
+    }
+  }
+  for (var j = 0; j < roomNumberInput.options.length; j++) {
+    var optionRoom = roomNumberInput.options[j];
+    optionRoom.disabled = false;
+    if (guestNumberInput.value == 0) {
+      if (optionRoom.value == 3 || optionRoom.value == 2 || optionRoom.value == 1 || optionRoom.value == 100) {
+        roomNumberInput.setCustomValidity('Номер не для гостей');
+        optionRoom.disabled = true;
+      }
+    } else if (guestNumberInput.value == 1) {
+      if (optionRoom.value == 3 || optionRoom.value == 2 || optionRoom.value == 1 || optionRoom.value == 100) {
+        roomNumberInput.setCustomValidity('Количество гостей не соответствует количеству комнат');
+        optionRoom.disabled = false;
+      }
+    } else if (guestNumberInput.value == 2) {
+      if (optionRoom.value == 3 || optionRoom.value == 2 || optionRoom.value == 100) {
+        roomNumberInput.setCustomValidity('Количество гостей не соответствует количеству комнат');
+        optionRoom.disabled = false;
+      } else {
+        optionRoom.disabled = true;
+      }
+    } else if (guestNumberInput.value == 3) {
+      if (optionRoom.value == 3 || optionRoom.value == 100) {
+        roomNumberInput.setCustomValidity('Количество гостей не соответствует количеству комнат');
+        optionRoom.disabled = false;
+      } else {
+        optionRoom.disabled = true;
+      }
+    }
+  }
+};
+checkGuestsRooms();
+roomNumberInput.addEventListener('change', checkGuestsRooms);
+
+var userTitleInput = adForm.querySelector('#title');
+
+userTitleInput.addEventListener('invalid', function (evt) {
+  if (userTitleInput.validity.tooShort) {
+    userTitleInput.setCustomValidity('Заголовок должен состоять минимум из 5-ти символов');
+  } else if (userTitleInput.validity.tooLong) {
+    userTitleInput.setCustomValidity('Заголовок не должен превышать 30-ти символов');
+  } else if (userTitleInput.validity.valueMissing) {
+    userTitleInput.setCustomValidity('Обязательное поле');
+  } else {
+    userTitleInput.setCustomValidity('');
+  }
+});
+
+var userAddressInput = adForm.querySelector('#address');
+
+userAddressInput.addEventListener('invalid', function (evt) {
+  if (userAddressInput.validity.tooShort) {
+    userAddressInput.setCustomValidity('Адрес должен состоять минимум из 5-ти символов');
+  } else if (userAddressInput.validity.tooLong) {
+    userAddressInput.setCustomValidity('Адрес не должен превышать 50-ти символов');
+  } else if (userAddressInput.validity.valueMissing) {
+    userAddressInput.setCustomValidity('Обязательное поле');
+  } else {
+    userAddressInput.setCustomValidity('');
+  }
+});
+
+userTitleInput.addEventListener('input', function (evt) {
+  var target = evt.target;
+  if (target.value.length < 2) {
+    target.setCustomValidity('Имя должно состоять минимум из 2-х символов');
+  } else {
+    target.setCustomValidity('');
+  }
+});
+
+
+var onResetClick = function () {
+  var popup = map.querySelector('.popup');
+  if (popup) {
+    closePopup();
+  }
+  toggleMapFormDisable(true);
+  var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+  for (var i = 0; i < pinsForDelete.length; i++) {
+    document.querySelector('.map__pins').removeChild(pinsForDelete[i]);
+  }
+
+  getMainPinPosition();
+  mainPin.addEventListener('mouseup', onMainPinClick);
+};
+
+var reset = adForm.querySelector('.ad-form__reset');
+reset.addEventListener('click', onResetClick);
+var submit = adForm.querySelector('.ad-form__submit');
+
+submit.addEventListener('click', function () {
+  // проверка комнат
+  roomNumberInput.style.borderColor = '#d9d9d3';
+  userTitleInput.style.borderColor = '#d9d9d3';
+  checkGuestsRooms();
+});
