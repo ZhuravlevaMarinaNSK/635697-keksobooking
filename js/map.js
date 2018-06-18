@@ -262,6 +262,9 @@ var checkGuestsRooms = function () {
       }
     }
   }
+};
+
+var checkRooms = function () {
   for (var j = 0; j < roomNumberInput.options.length; j++) {
     var optionRoom = roomNumberInput.options[j];
     optionRoom.disabled = false;
@@ -293,7 +296,9 @@ var checkGuestsRooms = function () {
   }
 };
 checkGuestsRooms();
+checkRooms();
 roomNumberInput.addEventListener('change', checkGuestsRooms);
+guestNumberInput.addEventListener('change', checkRooms);
 
 var userTitleInput = adForm.querySelector('#title');
 
