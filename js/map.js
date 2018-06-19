@@ -175,7 +175,32 @@ var checkGuestsRooms = function () {
       } else {
         option.disabled = false;
       }
+    } else if (+roomNumberInput.value === 100) {
+      if (+option.value === 0) {
+        option.disabled = false;
+      } else {
+        option.disabled = true;
+      }
     }
+  }
+};
+
+var typeInput = document.querySelector('#type');
+var priceInput = document.querySelector('#price');
+
+var onTypeChange = function () {
+  if (typeInput.value === 'bungalo') {
+    priceInput.min = 0;
+    priceInput.placeholder = 0;
+  } else if (typeInput.value === 'flat') {
+    priceInput.min = 1000;
+    priceInput.placeholder = 1000;
+  } else if (typeInput.value === 'house') {
+    priceInput.min = 5000;
+    priceInput.placeholder = 5000;
+  } else if (typeInput.value === 'palace') {
+    priceInput.min = 10000;
+    priceInput.placeholder = 10000;
   }
 };
 
@@ -208,22 +233,24 @@ var checkRooms = function () {
     }
   }
 };
+var timeCheckinInput = document.querySelector('#timein');
+var timeCheckoutInput = document.querySelector('#timeout');
 
-var userAddressInput = adForm.querySelector('#address');
+var ontimeCheckinChange = function () {
+  timeCheckoutInput.value = timeCheckinInput.value;
+};
 
-var onAddressInputInvalid = function () {
-  if (userAddressInput.validity.tooShort) {
-    userAddressInput.setCustomValidity('Адрес должен состоять минимум из 5-ти символов');
-  } else if (userAddressInput.validity.tooLong) {
-    userAddressInput.setCustomValidity('Адрес не должен превышать 50-ти символов');
-  } else if (userAddressInput.validity.valueMissing) {
-    userAddressInput.setCustomValidity('Обязательное поле');
-  } else {
-    userAddressInput.setCustomValidity('');
-  }
+var ontimeCheckoutChange = function () {
+  timeCheckinInput.value = timeCheckoutInput.value;
 };
 
 var reset = adForm.querySelector('.ad-form__reset');
+// var submit = adForm.querySelector('.ad-form__submit');
+// var success = adForm.querySelector('.success');
+// success.add.classList('hidden');
+// var onSubmitClick = function () {
+//   success.remove.classList('hidden');
+// };
 
 var toggleMapFormDisable = function (isDisabled) {
   map.classList.toggle('map--faded', isDisabled);
@@ -236,18 +263,21 @@ var toggleMapFormDisable = function (isDisabled) {
   checkRooms();
   getMainPinPosition();
   mainPin.removeEventListener('mouseup', onMainPinClick);
-  userAddressInput.removeEventListener('invalid', onAddressInputInvalid);
   userTitleInput.removeEventListener('input', onTitleInputInvalid);
+  typeInput.removeEventListener('change', onTypeChange);
   mainPin.removeEventListener('mousedown', onMainPinMousedown);
+  timeCheckinInput.removeEventListener('change', ontimeCheckinChange);
+  timeCheckoutInput.removeEventListener('change', ontimeCheckoutChange);
+  // submit.removeEventListener('click', onSubmitClick);
 };
 
 var userTitleInput = adForm.querySelector('#title');
 
 var onTitleInputInvalid = function () {
   if (userTitleInput.validity.tooShort) {
-    userTitleInput.setCustomValidity('Заголовок должен состоять минимум из 5-ти символов');
+    userTitleInput.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
   } else if (userTitleInput.validity.tooLong) {
-    userTitleInput.setCustomValidity('Заголовок не должен превышать 30-ти символов');
+    userTitleInput.setCustomValidity('Заголовок не должен превышать 100 символов');
   } else if (userTitleInput.validity.valueMissing) {
     userTitleInput.setCustomValidity('Обязательное поле');
   } else {
@@ -261,12 +291,16 @@ var onMainPinClick = function () {
   toggleMapFormDisable(false);
   mainPin.removeEventListener('mouseup', onMainPinClick);
   createPins(cards);
+  onTypeChange();
   reset.addEventListener('click', onResetClick);
   roomNumberInput.addEventListener('change', checkGuestsRooms);
   guestNumberInput.addEventListener('change', checkRooms);
-  userAddressInput.addEventListener('invalid', onAddressInputInvalid);
+  typeInput.addEventListener('change', onTypeChange);
   userTitleInput.addEventListener('input', onTitleInputInvalid);
   mainPin.addEventListener('mousedown', onMainPinMousedown);
+  timeCheckinInput.addEventListener('change', ontimeCheckinChange);
+  timeCheckoutInput.addEventListener('change', ontimeCheckoutChange);
+  // submit.addEventListener('click', onSubmitClick);
 };
 
 mainPin.addEventListener('mouseup', onMainPinClick);
@@ -351,7 +385,7 @@ var onResetClick = function () {
   for (var i = 0; i < pinsForDelete.length; i++) {
     document.querySelector('.map__pins').removeChild(pinsForDelete[i]);
   }
-
+  adForm.reset();
   getMainPinPosition();
   mainPin.addEventListener('mouseup', onMainPinClick);
 };
