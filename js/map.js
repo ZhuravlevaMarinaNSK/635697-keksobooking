@@ -255,10 +255,20 @@ var success = document.querySelector('.success');
 success.classList.add('hidden');
 
 var onSubmitClick = function (evt) {
-  evt.setDefaultCondition();
-  success.classList.remove('hidden');
-  document.addEventListener('keydown', onSuccessEscPress);
-  success.addEventListener('click', closeSuccessMessage);
+  if (userTitleInput.checkValidity() && priceInput.checkValidity()) {
+    evt.preventDefault();
+    toggleMapFormDisable(true);
+    var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+    for (var i = 0; i < pinsForDelete.length; i++) {
+      document.querySelector('.map__pins').removeChild(pinsForDelete[i]);
+    }
+    adForm.reset();
+    getMainPinPosition();
+    mainPin.addEventListener('mouseup', onMainPinClick);
+    success.classList.remove('hidden');
+    document.addEventListener('keydown', onSuccessEscPress);
+    success.addEventListener('click', closeSuccessMessage);
+  }
 };
 
 var toggleMapFormDisable = function (isDisabled) {
@@ -277,6 +287,7 @@ var toggleMapFormDisable = function (isDisabled) {
   timeCheckinInput.removeEventListener('change', ontimeCheckinChange);
   timeCheckoutInput.removeEventListener('change', ontimeCheckoutChange);
   submit.removeEventListener('click', onSubmitClick);
+  userTitleInput.removeEventListener('input', onTitleInput);
 };
 
 var userTitleInput = adForm.querySelector('#title');
@@ -294,18 +305,29 @@ var onTitleInputInvalid = function () {
   userTitleInput.addEventListener('invalid', onTitleInputInvalid);
 };
 
+var onTitleInput = function (evt) {
+  var target = evt.target;
+  if (target.value.length < 5) {
+    target.setCustomValidity('Имя должно состоять минимум из 5-ти символов');
+  } else {
+    target.setCustomValidity('');
+  }
+};
+
 toggleMapFormDisable(true);
 
 var onMainPinClick = function () {
   toggleMapFormDisable(false);
   mainPin.removeEventListener('mouseup', onMainPinClick);
   createPins(cards);
+  guestNumberInput.options[2].selected = true;
   onTypeChange();
   reset.addEventListener('click', onResetClick);
   roomNumberInput.addEventListener('change', checkGuestsRooms);
 
   typeInput.addEventListener('change', onTypeChange);
   userTitleInput.addEventListener('invalid', onTitleInputInvalid);
+  userTitleInput.addEventListener('input', onTitleInput);
   mainPin.addEventListener('mousedown', onMainPinMousedown);
   timeCheckinInput.addEventListener('change', ontimeCheckinChange);
   timeCheckoutInput.addEventListener('change', ontimeCheckoutChange);
