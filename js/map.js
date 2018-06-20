@@ -167,6 +167,7 @@ var checkGuestsRooms = function () {
         option.disabled = true;
       } else {
         option.disabled = false;
+        option.selected = true;
       }
     } else if (+roomNumberInput.value === 2) {
       if (+option.value === 3 || +option.value === 0) {
@@ -177,6 +178,7 @@ var checkGuestsRooms = function () {
     } else if (+roomNumberInput.value === 100) {
       if (+option.value === 0) {
         option.disabled = false;
+        option.selected = true;
       } else {
         option.disabled = true;
       }
@@ -215,12 +217,12 @@ var checkRooms = function () {
     var optionRoom = roomNumberInput.options[j];
     optionRoom.disabled = false;
     if (+guestNumberInput.value === 0) {
-      if (+optionRoom.value === 3 || +optionRoom.value === 2 || +optionRoom.value === 1) {
-        optionRoom.disabled = true;
-      }
+      optionRoom.disabled = false;
     } else if (+guestNumberInput.value === 1) {
       if (+optionRoom.value === 3 || +optionRoom.value === 2 || +optionRoom.value === 1) {
         optionRoom.disabled = false;
+      } else {
+        optionRoom.disabled = true;
       }
     } else if (+guestNumberInput.value === 2) {
       if (+optionRoom.value === 3 || +optionRoom.value === 2) {
@@ -237,7 +239,9 @@ var checkRooms = function () {
       }
     }
   }
+  checkGuestsRooms();
 };
+
 var timeCheckinInput = document.querySelector('#timein');
 var timeCheckoutInput = document.querySelector('#timeout');
 
@@ -320,7 +324,6 @@ var onMainPinClick = function () {
   toggleMapFormDisable(false);
   mainPin.removeEventListener('mouseup', onMainPinClick);
   createPins(cards);
-  guestNumberInput.options[2].selected = true;
   onTypeChange();
   reset.addEventListener('click', onResetClick);
   roomNumberInput.addEventListener('change', checkGuestsRooms);
