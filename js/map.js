@@ -18,6 +18,7 @@ var PIN_WIDTH = 40;
 
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
+var MAIN_PIN_TAIL = 22;
 
 var map = document.querySelector('.map');
 var similarPopupTemplate = document.querySelector('template')
@@ -27,14 +28,6 @@ var adForm = document.querySelector('.ad-form');
 var mainPin = map.querySelector('.map__pin--main');
 var adFormFieldsets = adForm.querySelectorAll('fieldset');
 var pins = document.querySelector('.map__pins');
-
-var MAIN_PIN_TAIL = 22;
-var TOP_EDGE = 130 - mainPin.offsetHeight;
-var BOTTOM_EDGE = pins.offsetHeight - mainPin.offsetHeight - MAIN_PIN_TAIL;
-
-var LEFT_EDGE = 0;
-var RIGHT_EDGE = pins.offsetWidth - mainPin.offsetWidth;
-
 
 var getRandom = function (min, max) {
   return Math.floor(Math.random() * (max + 1 - min) + min);
@@ -158,41 +151,6 @@ var createPins = function (ads) {
 var roomNumberInput = document.querySelector('#room_number');
 var guestNumberInput = document.querySelector('#capacity');
 
-var checkGuestsRooms = function () {
-  for (var i = 0; i < guestNumberInput.options.length; i++) {
-    var option = guestNumberInput.options[i];
-    option.disabled = false;
-    if (+roomNumberInput.value === 1) {
-      if (+option.value === 3 || +option.value === 2 || +option.value === 0) {
-        option.disabled = true;
-      } else {
-        option.disabled = false;
-        option.selected = true;
-      }
-    } else if (+roomNumberInput.value === 2) {
-      if (+option.value === 3 || +option.value === 0) {
-        option.disabled = true;
-      } else {
-        option.disabled = false;
-      }
-    } else if (+roomNumberInput.value === 100) {
-      if (+option.value === 0) {
-        option.disabled = false;
-        option.selected = true;
-      } else {
-        option.disabled = true;
-      }
-    } else if (+roomNumberInput.value === 3) {
-      if (+option.value === 0) {
-        option.disabled = true;
-      } else {
-        option.disabled = false;
-      }
-    }
-  }
-  guestNumberInput.addEventListener('change', checkRooms);
-};
-
 var typeInput = document.querySelector('#type');
 var priceInput = document.querySelector('#price');
 
@@ -212,35 +170,36 @@ var onTypeChange = function () {
   }
 };
 
-var checkRooms = function () {
-  for (var j = 0; j < roomNumberInput.options.length; j++) {
-    var optionRoom = roomNumberInput.options[j];
-    optionRoom.disabled = false;
-    if (+guestNumberInput.value === 0) {
-      optionRoom.disabled = false;
-    } else if (+guestNumberInput.value === 1) {
-      if (+optionRoom.value === 3 || +optionRoom.value === 2 || +optionRoom.value === 1) {
-        optionRoom.disabled = false;
-      } else {
-        optionRoom.disabled = true;
-      }
-    } else if (+guestNumberInput.value === 2) {
-      if (+optionRoom.value === 3 || +optionRoom.value === 2) {
-        optionRoom.disabled = false;
-      } else {
-        optionRoom.disabled = true;
-      }
-    } else if (+guestNumberInput.value === 3) {
-      if (+optionRoom.value === 3) {
-        optionRoom.disabled = false;
-      } else {
-        optionRoom.disabled = true;
-        optionRoom.selected = false;
-      }
-    }
+var onTypeInput = function () {
+  if (!priceInput.validity.valid) {
+    priceInput.style.borderColor = 'red';
   }
-  checkGuestsRooms();
 };
+
+var GUEST_ROOMS = {
+  1: [1],
+  2: [1, 2],
+  3: [1, 2, 3],
+  100: [0]
+};
+
+var roomCheck = function () {
+  var arr = GUEST_ROOMS[roomNumberInput.value].slice();
+  guestNumberInput.setCustomValidity('');
+  guestNumberInput.style.borderColor = '#d9d9d3';
+  if (arr.indexOf(parseInt(guestNumberInput.value, 10)) < 0) {
+    guestNumberInput.setCustomValidity('Число комнат не соответствует количеству гостей');
+    guestNumberInput.style.borderColor = 'red';
+  }
+};
+
+roomNumberInput.addEventListener('change', function () {
+  roomCheck();
+});
+
+guestNumberInput.addEventListener('change', function () {
+  roomCheck();
+});
 
 var timeCheckinInput = document.querySelector('#timein');
 var timeCheckoutInput = document.querySelector('#timeout');
@@ -259,13 +218,15 @@ var success = document.querySelector('.success');
 success.classList.add('hidden');
 
 var onSubmitClick = function (evt) {
-  if (userTitleInput.checkValidity() && priceInput.checkValidity()) {
+  roomCheck();
+  if (userTitleInput.checkValidity() && priceInput.checkValidity() && roomNumberInput.checkValidity() && guestNumberInput.checkValidity()) {
     evt.preventDefault();
     toggleMapFormDisable(true);
     var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
     for (var i = 0; i < pinsForDelete.length; i++) {
       document.querySelector('.map__pins').removeChild(pinsForDelete[i]);
     }
+
     adForm.reset();
     getMainPinPosition();
     mainPin.addEventListener('mouseup', onMainPinClick);
@@ -282,9 +243,9 @@ var toggleMapFormDisable = function (isDisabled) {
   for (var k = 0; k < adFormFieldsets.length; k++) {
     adFormFieldsets[k].disabled = isDisabled;
   }
-  checkGuestsRooms();
   getMainPinPosition();
   mainPin.removeEventListener('mouseup', onMainPinClick);
+  priceInput.removeEventListener('invalid', onTypeInput);
   userTitleInput.removeEventListener('input', onTitleInputInvalid);
   typeInput.removeEventListener('change', onTypeChange);
   mainPin.removeEventListener('mousedown', onMainPinMousedown);
@@ -299,10 +260,13 @@ var userTitleInput = adForm.querySelector('#title');
 var onTitleInputInvalid = function () {
   if (userTitleInput.validity.tooShort) {
     userTitleInput.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
+    userTitleInput.style.borderColor = 'red';
   } else if (userTitleInput.validity.tooLong) {
     userTitleInput.setCustomValidity('Заголовок не должен превышать 100 символов');
+    userTitleInput.style.borderColor = 'red';
   } else if (userTitleInput.validity.valueMissing) {
     userTitleInput.setCustomValidity('Обязательное поле');
+    userTitleInput.style.borderColor = 'red';
   } else {
     userTitleInput.setCustomValidity('');
   }
@@ -326,9 +290,9 @@ var onMainPinClick = function () {
   createPins(cards);
   onTypeChange();
   reset.addEventListener('click', onResetClick);
-  roomNumberInput.addEventListener('change', checkGuestsRooms);
-
+  priceInput.addEventListener('invalid', onTypeInput);
   typeInput.addEventListener('change', onTypeChange);
+
   userTitleInput.addEventListener('invalid', onTitleInputInvalid);
   userTitleInput.addEventListener('input', onTitleInput);
   mainPin.addEventListener('mousedown', onMainPinMousedown);
@@ -436,6 +400,11 @@ var onResetClick = function () {
   mainPin.addEventListener('mouseup', onMainPinClick);
 };
 
+var TOP_EDGE = 130;
+var BOTTOM_EDGE = 630;
+var LEFT_EDGE = 0;
+var RIGHT_EDGE = pins.offsetWidth - mainPin.offsetWidth;
+
 var onMainPinMousedown = function (evt) {
   evt.preventDefault();
 
@@ -445,6 +414,7 @@ var onMainPinMousedown = function (evt) {
   };
 
   var dragged = false;
+
 
   var onMouseMove = function (moveEvt) {
     moveEvt.preventDefault();
