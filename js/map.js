@@ -20,6 +20,17 @@ var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
 var MAIN_PIN_TAIL = 22;
 
+var TOP_EDGE = 130;
+var BOTTOM_EDGE = 630;
+var LEFT_EDGE = 0;
+
+var GUEST_ROOMS = {
+  1: [1],
+  2: [1, 2],
+  3: [1, 2, 3],
+  100: [0]
+};
+
 var map = document.querySelector('.map');
 var similarPopupTemplate = document.querySelector('template')
   .content;
@@ -155,41 +166,50 @@ var typeInput = document.querySelector('#type');
 var priceInput = document.querySelector('#price');
 
 var onTypeChange = function () {
-  if (typeInput.value === 'bungalo') {
-    priceInput.min = 0;
-    priceInput.placeholder = 0;
-  } else if (typeInput.value === 'flat') {
-    priceInput.min = 1000;
-    priceInput.placeholder = 1000;
-  } else if (typeInput.value === 'house') {
-    priceInput.min = 5000;
-    priceInput.placeholder = 5000;
-  } else if (typeInput.value === 'palace') {
-    priceInput.min = 10000;
-    priceInput.placeholder = 10000;
+  switch (typeInput.value) {
+    case 'bungalo':
+      priceInput.min = 0;
+      priceInput.placeholder = 0;
+      break;
+    case 'flat':
+      priceInput.min = 1000;
+      priceInput.placeholder = 1000;
+      break;
+    case 'house':
+      priceInput.min = 5000;
+      priceInput.placeholder = 5000;
+      break;
+    case 'palace':
+      priceInput.min = 10000;
+      priceInput.placeholder = 10000;
+      break;
   }
 };
 
 var onTypeInput = function () {
   if (!priceInput.validity.valid) {
-    priceInput.style.borderColor = 'red';
+    highlightBorderError(priceInput);
+  } else {
+    unhighlightBorderError(priceInput);
   }
 };
 
-var GUEST_ROOMS = {
-  1: [1],
-  2: [1, 2],
-  3: [1, 2, 3],
-  100: [0]
+var highlightBorderError = function (element) {
+  element.style.borderColor = 'red';
+};
+
+var unhighlightBorderError = function (element) {
+  element.style.borderColor = '#d9d9d3';
 };
 
 var roomCheck = function () {
   var arr = GUEST_ROOMS[roomNumberInput.value].slice();
   guestNumberInput.setCustomValidity('');
-  guestNumberInput.style.borderColor = '#d9d9d3';
   if (arr.indexOf(parseInt(guestNumberInput.value, 10)) < 0) {
     guestNumberInput.setCustomValidity('Число комнат не соответствует количеству гостей');
-    guestNumberInput.style.borderColor = 'red';
+    highlightBorderError(guestNumberInput);
+  } else {
+    unhighlightBorderError(guestNumberInput);
   }
 };
 
@@ -260,15 +280,16 @@ var userTitleInput = adForm.querySelector('#title');
 var onTitleInputInvalid = function () {
   if (userTitleInput.validity.tooShort) {
     userTitleInput.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
-    userTitleInput.style.borderColor = 'red';
+    highlightBorderError(userTitleInput);
   } else if (userTitleInput.validity.tooLong) {
     userTitleInput.setCustomValidity('Заголовок не должен превышать 100 символов');
-    userTitleInput.style.borderColor = 'red';
+    highlightBorderError(userTitleInput);
   } else if (userTitleInput.validity.valueMissing) {
     userTitleInput.setCustomValidity('Обязательное поле');
-    userTitleInput.style.borderColor = 'red';
+    highlightBorderError(userTitleInput);
   } else {
     userTitleInput.setCustomValidity('');
+    unhighlightBorderError(userTitleInput);
   }
   userTitleInput.addEventListener('invalid', onTitleInputInvalid);
 };
@@ -279,6 +300,7 @@ var onTitleInput = function (evt) {
     target.setCustomValidity('Имя должно состоять минимум из 5-ти символов');
   } else {
     target.setCustomValidity('');
+    unhighlightBorderError(userTitleInput);
   }
 };
 
@@ -291,6 +313,7 @@ var onMainPinClick = function () {
   onTypeChange();
   reset.addEventListener('click', onResetClick);
   priceInput.addEventListener('invalid', onTypeInput);
+  priceInput.addEventListener('input', onTypeInput);
   typeInput.addEventListener('change', onTypeChange);
 
   userTitleInput.addEventListener('invalid', onTitleInputInvalid);
@@ -400,10 +423,7 @@ var onResetClick = function () {
   mainPin.addEventListener('mouseup', onMainPinClick);
 };
 
-var TOP_EDGE = 130;
-var BOTTOM_EDGE = 630;
-var LEFT_EDGE = 0;
-var RIGHT_EDGE = pins.offsetWidth - mainPin.offsetWidth;
+var rightEdge = pins.offsetWidth - mainPin.offsetWidth;
 
 var onMainPinMousedown = function (evt) {
   evt.preventDefault();
@@ -442,8 +462,8 @@ var onMainPinMousedown = function (evt) {
 
     if (currentX < LEFT_EDGE) {
       currentX = LEFT_EDGE;
-    } else if (currentX > RIGHT_EDGE) {
-      currentX = RIGHT_EDGE;
+    } else if (currentX > rightEdge) {
+      currentX = rightEdge;
     }
 
     mainPin.style.top = currentY + 'px';
