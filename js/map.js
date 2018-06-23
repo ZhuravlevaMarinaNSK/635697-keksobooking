@@ -1,29 +1,19 @@
 'use strict';
 
 var TITLES = ['Большая уютная квартира', 'Маленькая неуютная квартира', 'Огромный прекрасный дворец', 'Маленький ужасный дворец', 'Красивый гостевой домик', 'Некрасивый негостеприимный домик', 'Уютное бунгало далеко от моря', 'Неуютное бунгало по колено в воде'];
-
 var TYPES = ['palace', 'flat', 'house', 'bungalo'];
-
 var TIMES = ['12:00', '13:00', '14:00'];
-
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
-
 var PHOTOS = ['http://o0.github.io/assets/images/tokyo/hotel1.jpg', 'http://o0.github.io/assets/images/tokyo/hotel2.jpg', 'http://o0.github.io/assets/images/tokyo/hotel3.jpg'];
-
 var NUMBER_OF_ADS = 8;
-
 var PIN_HEIGHT = 40;
-
 var PIN_WIDTH = 40;
-
 var ESC_KEYCODE = 27;
 var ENTER_KEYCODE = 13;
 var MAIN_PIN_TAIL = 22;
-
 var TOP_EDGE = 130;
 var BOTTOM_EDGE = 630;
 var LEFT_EDGE = 0;
-
 var GUEST_ROOMS = {
   1: [1],
   2: [1, 2],
