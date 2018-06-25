@@ -5,6 +5,8 @@
   var adForm = document.querySelector('.ad-form');
   var mainPin = map.querySelector('.map__pin--main');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
+  var reset = adForm.querySelector('.ad-form__reset');
+  var submit = adForm.querySelector('.ad-form__submit');
   var priceInput = adForm.querySelector('#price');
   var userTitleInput = adForm.querySelector('#title');
   var typeInput = adForm.querySelector('#type');
@@ -35,9 +37,6 @@
     submit.removeEventListener('click', window.formValidation.onSubmitClick);
     userTitleInput.removeEventListener('input', window.formValidation.onTitleInput);
   };
-
-  var reset = adForm.querySelector('.ad-form__reset');
-  var submit = adForm.querySelector('.ad-form__submit');
 
   toggleMapFormDisable(true);
 
