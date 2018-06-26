@@ -95,6 +95,7 @@
       success.classList.remove('hidden');
       document.addEventListener('keydown', onSuccessEscPress);
       success.addEventListener('click', closeSuccessMessage);
+      window.backend.uploadFunction(new FormData(adForm), showSuccessMessage, window.utils.error);
     }
   };
 
@@ -133,6 +134,10 @@
     success.removeEventListener('click', closeSuccessMessage);
   };
 
+  var showSuccessMessage = function () {
+    success.classList.remove('hidden');
+  };
+
   var onResetClick = function () {
     var popup = map.querySelector('.popup');
     if (popup) {
@@ -153,6 +158,15 @@
       closeSuccessMessage();
     }
   };
+
+  var onErrorEsq = function (evt) {
+    var error = document.querySelector('.error-message');
+    if (evt.keyCode === window.utils.escKeycode) {
+      error.parentNode.removeChild(error);
+    }
+  };
+
+  document.addEventListener('keydown', onErrorEsq);
 
   window.formValidation = {
     onTypeInput: onTypeInput,

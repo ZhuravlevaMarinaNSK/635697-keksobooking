@@ -43,7 +43,6 @@
   var onMainPinClick = function () {
     toggleMapFormDisable(false);
     mainPin.removeEventListener('mouseup', onMainPinClick);
-    window.createCards.createPins(window.createCards.cards);
     window.formValidation.onTypeChange();
     reset.addEventListener('click', window.formValidation.onResetClick);
     priceInput.addEventListener('invalid', window.formValidation.onTypeInput);
@@ -55,6 +54,7 @@
     timeCheckinInput.addEventListener('change', window.formValidation.ontimeCheckinChange);
     timeCheckoutInput.addEventListener('change', window.formValidation.ontimeCheckoutChange);
     submit.addEventListener('click', window.formValidation.onSubmitClick);
+    window.backend.loadFunction(window.createCards.createPins, window.utils.error);
   };
 
   mainPin.addEventListener('mouseup', onMainPinClick);
