@@ -25,7 +25,6 @@
     });
 
     xhr.timeout = TIMEOUT;
-    console.log(xhr);
     return xhr;
   };
 
