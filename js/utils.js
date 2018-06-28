@@ -20,6 +20,21 @@
     100: [0]
   };
 
+  var errorHandler = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; padding: 50px 10px; margin: 0 auto; text-align: center; vertical-align: middle; background-color: #da641a; border: 15px dashed white';
+    node.style.position = 'absolute';
+    node.style.left = '190px';
+    node.style.right = '150px';
+    node.style.top = '100px';
+    node.style.bottom = '300px';
+    node.style.fontSize = '30px';
+    node.classList.add('error-message');
+
+    node.textContent = 'Что-то пошло не так ¯\_(ツ)_/¯ ' + errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
   window.utils = {
     titles: TITLES,
     types: TYPES,
@@ -33,6 +48,7 @@
     enterKeycode: ENTER_KEYCODE,
     mainPinTail: MAIN_PIN_TAIL,
     guestRooms: GUEST_ROOMS,
+    error: errorHandler,
     getRandom: function (min, max) {
       return Math.floor(Math.random() * (max + 1 - min) + min);
     },
