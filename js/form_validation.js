@@ -161,7 +161,7 @@
 
   var onErrorEsq = function (evt) {
     var error = document.querySelector('.error-message');
-    if (evt.keyCode === window.utils.escKeycode) {
+    if (error && evt.keyCode === window.utils.escKeycode) {
       error.parentNode.removeChild(error);
     }
   };

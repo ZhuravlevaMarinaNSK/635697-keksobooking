@@ -66,7 +66,7 @@
   };
 
   var onPopupEscPress = function (evt) {
-    if (evt.keyCode === window.utils.esqKeycode) {
+    if (evt.keyCode === window.utils.escKeycode) {
       closePopup();
     }
   };

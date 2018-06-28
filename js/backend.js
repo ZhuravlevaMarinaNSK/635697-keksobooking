@@ -3,7 +3,7 @@
 (function () {
   var URL_LOAD = 'https://js.dump.academy/keksobooking/data';
   var URL_UPLOAD = 'https://js.dump.academy/keksobooking';
-  var TIMEOUT = 10000;
+  var TIMEOUT = 100000;
   var SUCCESS_STATUS = 200;
 
   var backendConnect = function (onSuccess, onError) {
