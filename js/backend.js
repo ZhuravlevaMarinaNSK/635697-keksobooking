@@ -40,6 +40,7 @@
 
     xhr.open('GET', URL_LOAD);
     xhr.send();
+
   };
 
 

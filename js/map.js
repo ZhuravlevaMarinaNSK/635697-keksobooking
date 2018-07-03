@@ -2,6 +2,13 @@
 
 (function () {
   var map = document.querySelector('.map');
+
+  var typeSelect = document.querySelector('#housing-type');
+  var priceSelect = document.querySelector('#housing-price');
+  var roomsSelect = document.querySelector('#housing-rooms');
+  var guestsSelect = document.querySelector('#housing-guests');
+  var featuresSelect = document.querySelectorAll('.map__checkbox');
+
   var adForm = document.querySelector('.ad-form');
   var mainPin = map.querySelector('.map__pin--main');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
@@ -42,6 +49,9 @@
 
   var onMainPinClick = function () {
     toggleMapFormDisable(false);
+
+    window.backend.loadFunction(window.createCards.createPins, window.utils.error);
+    window.backend.loadFunction(window.filter.getInfo, window.utils.error);
     mainPin.removeEventListener('mouseup', onMainPinClick);
     window.formValidation.onTypeChange();
     reset.addEventListener('click', window.formValidation.onResetClick);
@@ -54,7 +64,13 @@
     timeCheckinInput.addEventListener('change', window.formValidation.ontimeCheckinChange);
     timeCheckoutInput.addEventListener('change', window.formValidation.ontimeCheckoutChange);
     submit.addEventListener('click', window.formValidation.onSubmitClick);
-    window.backend.loadFunction(window.createCards.createPins, window.utils.error);
+    typeSelect.addEventListener('change', window.filter.updatePins);
+    priceSelect.addEventListener('change', window.filter.updatePins);
+    roomsSelect.addEventListener('change', window.filter.updatePins);
+    guestsSelect.addEventListener('change', window.filter.updatePins);
+    for (var i = 0; i < featuresSelect.length; i++) {
+      featuresSelect[i].addEventListener('change', window.filter.updatePins);
+    }
   };
 
   mainPin.addEventListener('mouseup', onMainPinClick);

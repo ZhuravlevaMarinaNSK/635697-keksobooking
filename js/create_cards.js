@@ -4,6 +4,7 @@
   var similarPopupTemplate = document.querySelector('template')
   .content;
 
+
   var renderFeatureList = function (item) {
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < item.length; i++) {
@@ -48,15 +49,17 @@
 
   var createPins = function (ads) {
     var fragmentPin = document.createDocumentFragment();
-
-    for (var i = 0; i < 8; i++) {
-      var randomIndex = window.utils.getRandom(0, ads.length - 1);
-      var randomAd = ads[randomIndex];
-      ads.splice(randomIndex, 1);
-
-      fragmentPin.appendChild(renderPin(randomAd));
+    if (ads.length > 0 && ads.length > 8) {
+      for (var i = 0; i < 8; i++) {
+        fragmentPin.appendChild(renderPin(ads[i]));
+      }
+    } else if (ads.length > 0 && ads.length < 8) {
+      for (i = 0; i < ads.length; i++) {
+        fragmentPin.appendChild(renderPin(ads[i]));
+      }
     }
     document.querySelector('.map__pins').appendChild(fragmentPin);
+    return;
   };
 
   var getHomeType = function (homeType) {

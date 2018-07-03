@@ -12,6 +12,7 @@
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
   var MAIN_PIN_TAIL = 22;
+  var DEBOUNCE_INTERVAL = 300;
 
   var GUEST_ROOMS = {
     1: [1],
@@ -35,6 +36,20 @@
     document.body.insertAdjacentElement('afterbegin', node);
   };
 
+  var debounce = function (fun) {
+    var lastTimeout = null;
+
+    return function () {
+      var args = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        fun.apply(null, args);
+      }, DEBOUNCE_INTERVAL);
+    };
+  };
+
   window.utils = {
     titles: TITLES,
     types: TYPES,
@@ -49,6 +64,7 @@
     mainPinTail: MAIN_PIN_TAIL,
     guestRooms: GUEST_ROOMS,
     error: errorHandler,
+    debounce: debounce,
     getRandom: function (min, max) {
       return Math.floor(Math.random() * (max + 1 - min) + min);
     },
