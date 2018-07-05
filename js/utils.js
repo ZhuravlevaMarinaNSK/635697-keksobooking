@@ -36,15 +36,16 @@
     document.body.insertAdjacentElement('afterbegin', node);
   };
 
+  var lastTimeout;
   var debounce = function (fun) {
     var lastTimeout = null;
 
-    return function () {
+    return function() {
       var args = arguments;
       if (lastTimeout) {
         window.clearTimeout(lastTimeout);
       }
-      lastTimeout = window.setTimeout(function () {
+      lastTimeout = window.setTimeout(function() {
         fun.apply(null, args);
       }, DEBOUNCE_INTERVAL);
     };

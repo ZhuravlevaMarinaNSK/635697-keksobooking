@@ -19,6 +19,7 @@
   //  загрузка данных для пинов
   var getData = function (info) {
     pins = info.slice();
+    disableForm(false);
   };
 
   var getMainPinPosition = function () {
@@ -35,7 +36,7 @@
     }
   };
 
-  var disableForm = function () {
+  var setAnyForm = function () {
     var filter = document.querySelector('.map__filters');
     var features = filter.querySelectorAll('input');
     var anyValue = 'any';
@@ -50,16 +51,31 @@
     });
   };
 
+  var disableForm = function (isDisabled) {
+    var filterInputs = allFilters.querySelectorAll('input');
+    var filterSelects = allFilters.querySelectorAll('select');
+    filterInputs.forEach(function (item) {
+      item.disabled = isDisabled;
+  });
+    filterSelects.forEach(function (item) {
+      item.disabled = isDisabled;
+  });
+};
+
   var updatePins = function () {
     var mapCard = document.querySelector('.map__card');
     if (mapCard) {
       closePopup();
-    }
+    };
     removePins();
     window.filter.getInfo();
     var pinsData = pins.filter(window.filter.result);
     window.createCards.createPins(pinsData);
   };
+
+  var onChangeFilter = window.utils.debounce(function () {
+    updatePins();
+  });
 
   var toggleMapFormDisable = function (isDisabled) {
     map.classList.toggle('map--faded', isDisabled);
@@ -77,7 +93,7 @@
     timeCheckoutInput.removeEventListener('change', window.formValidation.ontimeCheckoutChange);
     submit.removeEventListener('click', window.formValidation.onSubmitClick);
     userTitleInput.removeEventListener('input', window.formValidation.onTitleInput);
-    disableForm();
+    setAnyForm();
   };
 
   toggleMapFormDisable(true);
@@ -99,14 +115,8 @@
     timeCheckinInput.addEventListener('change', window.formValidation.ontimeCheckinChange);
     timeCheckoutInput.addEventListener('change', window.formValidation.ontimeCheckoutChange);
     submit.addEventListener('click', window.formValidation.onSubmitClick);
-    allFilters.addEventListener('change', updatePins);
-    // typeSelect.addEventListener('change', window.filter.updatePins);
-    // priceSelect.addEventListener('change', window.filter.updatePins);
-    // roomsSelect.addEventListener('change', window.filter.updatePins);
-    // guestsSelect.addEventListener('change', window.filter.updatePins);
-    // for (var i = 0; i < featuresSelect.length; i++) {
-    //   featuresSelect[i].addEventListener('change', window.filter.updatePins);
-    // }
+    allFilters.addEventListener('change', onChangeFilter);
+    disableForm(true);
   };
 
   mainPin.addEventListener('mouseup', onMainPinClick);

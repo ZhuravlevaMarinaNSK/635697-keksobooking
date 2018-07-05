@@ -49,11 +49,11 @@
 
   var createPins = function (ads) {
     var fragmentPin = document.createDocumentFragment();
-    if (ads.length > 0 && ads.length > 8) {
-      for (var i = 0; i < 8; i++) {
+    if (ads.length > 0 && ads.length > 5) {
+      for (var i = 0; i < 5; i++) {
         fragmentPin.appendChild(renderPin(ads[i]));
       }
-    } else if (ads.length > 0 && ads.length < 8) {
+    } else if (ads.length > 0 && ads.length < 5) {
       for (i = 0; i < ads.length; i++) {
         fragmentPin.appendChild(renderPin(ads[i]));
       }

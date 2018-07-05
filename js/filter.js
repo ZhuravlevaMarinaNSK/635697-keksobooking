@@ -42,7 +42,7 @@
 
   var checkFeaturesfield = function (item) {
     var features = filter.querySelectorAll('input:checked');
-    var result;
+    var result = true;
     features.forEach(function (feature) {
       result = item.offer.features.some(function (data) {
         return feature.value === data;
@@ -62,5 +62,6 @@
     result: result
   };
 
-  // проблема с отрисовкой пинов
+  // блокировать фильтр до загрузки пинов
+  // дребезг
 })();
