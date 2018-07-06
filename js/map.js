@@ -4,7 +4,6 @@
   var MAIN_PIN_LEFT = 570;
   var MAIN_PIN_TOP = 375;
   var map = document.querySelector('.map');
-  var mapPins = map.querySelector('.map__pins');
   var allFilters = map.querySelector('.map__filters');
   var adForm = document.querySelector('.ad-form');
   var mainPin = map.querySelector('.map__pin--main');
@@ -16,26 +15,12 @@
   var typeInput = adForm.querySelector('#type');
   var timeCheckinInput = document.querySelector('#timein');
   var timeCheckoutInput = document.querySelector('#timeout');
-  var pins = [];
-
-  //  загрузка данных для пинов
-  var getData = function (info) {
-    pins = info.slice();
-    disableForm(false);
-  };
 
   var getMainPinPosition = function () {
     var top = mainPin.offsetTop + window.utils.pinHeight + window.utils.mainPinTail;
     var left = mainPin.offsetLeft + window.utils.pinWidth / 2;
     var coordinates = top + ', ' + left;
     adForm.querySelector('#address').value = coordinates;
-  };
-
-  var removePins = function () {
-    var allPins = mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
-    for (var i = 0; i < allPins.length; i++) {
-      mapPins.removeChild(allPins[i]);
-    }
   };
 
   var setAnyForm = function () {
@@ -52,32 +37,6 @@
       }
     });
   };
-
-  var disableForm = function (isDisabled) {
-    var filterInputs = allFilters.querySelectorAll('input');
-    var filterSelects = allFilters.querySelectorAll('select');
-    filterInputs.forEach(function (item) {
-      item.disabled = isDisabled;
-    });
-    filterSelects.forEach(function (item) {
-      item.disabled = isDisabled;
-    });
-  };
-
-  var updatePins = function () {
-    var mapCard = document.querySelector('.map__card');
-    if (mapCard) {
-      closePopup();
-    }
-    removePins();
-    window.filter.getInfo();
-    var pinsData = pins.filter(window.filter.result);
-    window.createCards.createPins(pinsData);
-  };
-
-  var onChangeFilter = window.utils.debounce(function () {
-    updatePins();
-  });
 
   var toggleMapFormDisable = function (isDisabled) {
     map.classList.toggle('map--faded', isDisabled);
@@ -104,10 +63,9 @@
 
   var onMainPinClick = function () {
     toggleMapFormDisable(false);
-    window.filter.getInfo();
-    window.backend.loadFunction(getData, window.utils.error);
+    window.backend.loadFunction(window.filter.getData, window.utils.error);
     window.backend.loadFunction(window.createCards.createPins, window.utils.error);
-    mainPin.removeEventListener('mouseup', onMainPinClick);
+    mainPin.removeEventListener('mousedown', onMainPinClick);
     window.formValidation.onTypeChange();
     reset.addEventListener('click', window.formValidation.onResetClick);
     priceInput.addEventListener('invalid', window.formValidation.onTypeInput);
@@ -120,10 +78,10 @@
     timeCheckoutInput.addEventListener('change', window.formValidation.ontimeCheckoutChange);
     submit.addEventListener('click', window.formValidation.onSubmitClick);
     allFilters.addEventListener('change', onChangeFilter);
-    disableForm(true);
+    window.filter.disableForm(true);
   };
 
-  mainPin.addEventListener('mouseup', onMainPinClick);
+  mainPin.addEventListener('mousedown', onMainPinClick);
 
   var onPopupCloseEnterPress = function (evt) {
     if (evt.keyCode === window.utils.enterKeycode) {
@@ -158,6 +116,18 @@
     popupClose.addEventListener('keydown', onPopupCloseEnterPress);
     document.addEventListener('keydown', onPopupEscPress);
   };
+
+  var updatePins = function () {
+    var mapCard = document.querySelector('.map__card');
+    if (mapCard) {
+      closePopup();
+    }
+    window.filter.getSortedPins();
+  };
+
+  var onChangeFilter = window.utils.debounce(function () {
+    updatePins();
+  });
 
   window.map = {
     toggleMapFormDisable: toggleMapFormDisable,

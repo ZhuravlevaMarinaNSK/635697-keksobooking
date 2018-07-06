@@ -4,7 +4,26 @@
   var MIN_PRICE = 10000;
   var MAX_PRICE = 50000;
   var filter = document.querySelector('.map__filters');
+  var map = document.querySelector('.map');
+  var mapPins = map.querySelector('.map__pins');
   var anyValue = 'any';
+  var pins = [];
+  //  загрузка данных для пинов
+  var disableForm = function (isDisabled) {
+    var filterInputs = filter.querySelectorAll('input');
+    var filterSelects = filter.querySelectorAll('select');
+    filterInputs.forEach(function (item) {
+      item.disabled = isDisabled;
+    });
+    filterSelects.forEach(function (item) {
+      item.disabled = isDisabled;
+    });
+  };
+
+  var getData = function (info) {
+    pins = info.slice();
+    disableForm(false);
+  };
 
   var getInfo = function (datum) {
     var data = {
@@ -59,15 +78,27 @@
 
   // действие при выборе
 
-  var result = function (it) {
+  var removePins = function () {
+    var allPins = mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
+    for (var i = 0; i < allPins.length; i++) {
+      mapPins.removeChild(allPins[i]);
+    }
+  };
+
+  var sortPins = function (it) {
     return checkDataField(it, 'type') && checkDataField(it, 'guests') && checkDataField(it, 'rooms') && checkPricefield(it, 'price') && checkFeaturesfield(it);
   };
 
-  window.filter = {
-    getInfo: getInfo,
-    result: result
+  var getSortedPins = function () {
+    removePins();
+    getInfo();
+    var pinsData = pins.filter(sortPins);
+    window.createCards.createPins(pinsData);
   };
 
-  // блокировать фильтр до загрузки пинов
-  // дребезг
+  window.filter = {
+    getSortedPins: getSortedPins,
+    getData: getData,
+    disableForm: disableForm
+  };
 })();

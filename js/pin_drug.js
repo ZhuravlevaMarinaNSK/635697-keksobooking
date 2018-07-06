@@ -9,7 +9,7 @@
   var adForm = document.querySelector('.ad-form');
   var mainPin = document.querySelector('.map__pin--main');
   var rightEdge = pins.offsetWidth - mainPin.offsetWidth;
-
+  mainPin.style.zIndex = 1000;
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
 
