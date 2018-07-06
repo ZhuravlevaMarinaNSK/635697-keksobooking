@@ -56,17 +56,17 @@
     var filterSelects = allFilters.querySelectorAll('select');
     filterInputs.forEach(function (item) {
       item.disabled = isDisabled;
-  });
+    });
     filterSelects.forEach(function (item) {
       item.disabled = isDisabled;
-  });
-};
+    });
+  };
 
   var updatePins = function () {
     var mapCard = document.querySelector('.map__card');
     if (mapCard) {
       closePopup();
-    };
+    }
     removePins();
     window.filter.getInfo();
     var pinsData = pins.filter(window.filter.result);

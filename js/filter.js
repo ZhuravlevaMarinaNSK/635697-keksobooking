@@ -42,12 +42,18 @@
 
   var checkFeaturesfield = function (item) {
     var features = filter.querySelectorAll('input:checked');
-    var result = true;
-    features.forEach(function (feature) {
-      result = item.offer.features.some(function (data) {
-        return feature.value === data;
+    var result;
+    if (features.length > 0) {
+      var featuresArray = Array.prototype.slice.call(features);
+      result = featuresArray.every(function (feature) {
+        return item.offer.features.some(function (data) {
+          return feature.value === data;
+        });
       });
-    });
+
+    } else {
+      result = true;
+    }
     return result;
   };
 
