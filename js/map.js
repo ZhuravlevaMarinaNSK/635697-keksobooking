@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var MAIN_PIN_LEFT = 570;
+  var MAIN_PIN_TOP = 375;
   var map = document.querySelector('.map');
   var mapPins = map.querySelector('.map__pins');
   var allFilters = map.querySelector('.map__filters');
@@ -94,6 +96,8 @@
     submit.removeEventListener('click', window.formValidation.onSubmitClick);
     userTitleInput.removeEventListener('input', window.formValidation.onTitleInput);
     setAnyForm();
+    mainPin.style.left = MAIN_PIN_LEFT + 'px';
+    mainPin.style.top = MAIN_PIN_TOP + 'px';
   };
 
   toggleMapFormDisable(true);
