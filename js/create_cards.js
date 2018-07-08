@@ -51,7 +51,7 @@
       }
     } else if (ads.length > 0 && ads.length < 5) {
       ads.forEach(function (item) {
-        fragmentPin.appendChild(item);
+        fragmentPin.appendChild(renderPin(item));
       });
     }
     document.querySelector('.map__pins').appendChild(fragmentPin);
