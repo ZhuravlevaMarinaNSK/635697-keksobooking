@@ -16,8 +16,12 @@
   var timeCheckinInput = document.querySelector('#timein');
   var timeCheckoutInput = document.querySelector('#timeout');
 
-  var getMainPinPosition = function () {
-    var top = mainPin.offsetTop + window.utils.pinHeight + window.utils.mainPinTail;
+  var getMainPinPosition = function (isDisabled) {
+    var k = 1;
+    if (isDisabled) {
+      k = 0;
+    }
+    var top = mainPin.offsetTop + window.utils.pinHeight / 2 + (window.utils.pinHeight / 2 + window.utils.mainPinTail) * k;
     var left = mainPin.offsetLeft + window.utils.pinWidth / 2;
     var coordinates = top + ', ' + left;
     adForm.querySelector('#address').value = coordinates;
@@ -45,7 +49,8 @@
     for (var k = 0; k < adFormFieldsets.length; k++) {
       adFormFieldsets[k].disabled = isDisabled;
     }
-    getMainPinPosition();
+
+    getMainPinPosition(isDisabled);
     mainPin.removeEventListener('mouseup', onMainPinClick);
     priceInput.removeEventListener('invalid', window.formValidation.onTypeInput);
     userTitleInput.removeEventListener('input', window.formValidation.onTitleInputInvalid);
@@ -104,13 +109,12 @@
     popupClose.removeEventListener('keydown', onPopupCloseEnterPress);
   };
 
-  window.showCard = function (div, card) {
+  var showCard = function (div, card) {
     var mapCard = div.querySelector('.map__card');
     if (mapCard) {
       closePopup();
     }
     div.insertBefore(window.createCards.renderAd(card), div.children[4]);
-
     var popupClose = map.querySelector('.popup__close');
     popupClose.addEventListener('click', closePopup);
     popupClose.addEventListener('keydown', onPopupCloseEnterPress);
@@ -122,7 +126,9 @@
     if (mapCard) {
       closePopup();
     }
-    window.filter.getSortedPins();
+    window.createCards.removePins();
+    var pinsData = window.filter.getSortedPins();
+    window.createCards.createPins(pinsData);
   };
 
   var onChangeFilter = window.utils.debounce(function () {
@@ -133,6 +139,7 @@
     toggleMapFormDisable: toggleMapFormDisable,
     onMainPinClick: onMainPinClick,
     getMainPinPosition: getMainPinPosition,
-    closePopup: closePopup
+    closePopup: closePopup,
+    showCard: showCard
   };
 })();

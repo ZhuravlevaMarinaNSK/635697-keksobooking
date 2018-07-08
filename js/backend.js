@@ -23,30 +23,24 @@
     xhr.addEventListener('timeout', function () {
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
-
     xhr.timeout = TIMEOUT;
     return xhr;
   };
 
   var upload = function (data, onSuccess, onError) {
     var xhr = backendConnect(onSuccess, onError);
-
     xhr.open('POST', URL_UPLOAD);
     xhr.send(data);
   };
 
   var load = function (onSuccess, onError) {
     var xhr = backendConnect(onSuccess, onError);
-
     xhr.open('GET', URL_LOAD);
     xhr.send();
-
   };
-
 
   window.backend = {
     loadFunction: load,
     uploadFunction: upload
   };
-
 })();

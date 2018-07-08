@@ -4,18 +4,12 @@
   var MIN_PRICE = 10000;
   var MAX_PRICE = 50000;
   var filter = document.querySelector('.map__filters');
-  var map = document.querySelector('.map');
-  var mapPins = map.querySelector('.map__pins');
   var anyValue = 'any';
   var pins = [];
-  //  загрузка данных для пинов
+
   var disableForm = function (isDisabled) {
-    var filterInputs = filter.querySelectorAll('input');
-    var filterSelects = filter.querySelectorAll('select');
-    filterInputs.forEach(function (item) {
-      item.disabled = isDisabled;
-    });
-    filterSelects.forEach(function (item) {
+    var inputs = filter.querySelectorAll('input, select');
+    inputs.forEach(function (item) {
       item.disabled = isDisabled;
     });
   };
@@ -35,12 +29,10 @@
     return data[datum];
   };
 
-  //  для гостей, номеров, типов квартир
-
   var checkDataField = function (item, name) {
     return getInfo(name) === anyValue ? true : getInfo(name) === item.offer[name].toString();
   };
-  //  для цены
+
   var checkPricefield = function (item, name) {
     if (getInfo(name) !== anyValue) {
       switch (getInfo(name)) {
@@ -57,7 +49,6 @@
       return true;
     }
   };
-  // для особенностей
 
   var checkFeaturesfield = function (item) {
     var features = filter.querySelectorAll('input:checked');
@@ -69,20 +60,10 @@
           return feature.value === data;
         });
       });
-
     } else {
       result = true;
     }
     return result;
-  };
-
-  // действие при выборе
-
-  var removePins = function () {
-    var allPins = mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
-    for (var i = 0; i < allPins.length; i++) {
-      mapPins.removeChild(allPins[i]);
-    }
   };
 
   var sortPins = function (it) {
@@ -90,10 +71,9 @@
   };
 
   var getSortedPins = function () {
-    removePins();
     getInfo();
     var pinsData = pins.filter(sortPins);
-    window.createCards.createPins(pinsData);
+    return pinsData;
   };
 
   window.filter = {
