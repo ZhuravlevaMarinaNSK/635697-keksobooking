@@ -6,7 +6,7 @@
   var filter = document.querySelector('.map__filters');
   var anyValue = 'any';
   var pins = [];
-
+  var inputsValues;
   var disableForm = function (isDisabled) {
     var inputs = filter.querySelectorAll('input, select');
     inputs.forEach(function (item) {
@@ -19,23 +19,23 @@
     disableForm(false);
   };
 
-  var getInfo = function (datum) {
+  var getInfo = function () {
     var data = {
       type: filter.querySelector('#housing-type').value,
       price: filter.querySelector('#housing-price').value,
       rooms: filter.querySelector('#housing-rooms').value,
       guests: filter.querySelector('#housing-guests').value
     };
-    return data[datum];
+    return data;
   };
 
   var checkDataField = function (item, name) {
-    return getInfo(name) === anyValue ? true : getInfo(name) === item.offer[name].toString();
+    return inputsValues[name] === anyValue ? true : inputsValues[name] === item.offer[name].toString();
   };
 
   var checkPricefield = function (item, name) {
-    if (getInfo(name) !== anyValue) {
-      switch (getInfo(name)) {
+    if (inputsValues[name] !== anyValue) {
+      switch (inputsValues[name]) {
         case 'low':
           return item.offer.price < MIN_PRICE;
         case 'middle':
@@ -71,7 +71,7 @@
   };
 
   var getSortedPins = function () {
-    getInfo();
+    inputsValues = getInfo();
     var pinsData = pins.filter(sortPins);
     return pinsData;
   };
