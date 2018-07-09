@@ -15,6 +15,7 @@
   var typeInput = adForm.querySelector('#type');
   var timeCheckinInput = document.querySelector('#timein');
   var timeCheckoutInput = document.querySelector('#timeout');
+  var pins = [];
 
   var getMainPinPosition = function (isDisabled) {
     var k = 1;
@@ -68,7 +69,7 @@
 
   var onMainPinClick = function () {
     toggleMapFormDisable(false);
-    window.backend.loadFunction(window.filter.getData, window.utils.error);
+    window.backend.loadFunction(getData, window.utils.error);
     window.backend.loadFunction(window.createCards.createPins, window.utils.error);
     mainPin.removeEventListener('mousedown', onMainPinClick);
     window.formValidation.onTypeChange();
@@ -83,7 +84,7 @@
     timeCheckoutInput.addEventListener('change', window.formValidation.ontimeCheckoutChange);
     submit.addEventListener('click', window.formValidation.onSubmitClick);
     allFilters.addEventListener('change', onChangeFilter);
-    window.filter.disableForm(true);
+    disableForm(true);
   };
 
   mainPin.addEventListener('mousedown', onMainPinClick);
@@ -127,7 +128,7 @@
       closePopup();
     }
     window.createCards.removePins();
-    var pinsData = window.filter.getSortedPins();
+    var pinsData = pins.filter(window.filter.sortPins);
     window.createCards.createPins(pinsData);
   };
 
@@ -135,11 +136,25 @@
     updatePins();
   });
 
+  var getData = function (info) {
+    pins = info.slice();
+    disableForm(false);
+    return pins;
+  };
+
+  var disableForm = function (isDisabled) {
+    var inputs = allFilters.querySelectorAll('input, select');
+    inputs.forEach(function (item) {
+      item.disabled = isDisabled;
+    });
+  };
+
   window.map = {
     toggleMapFormDisable: toggleMapFormDisable,
     onMainPinClick: onMainPinClick,
     getMainPinPosition: getMainPinPosition,
     closePopup: closePopup,
-    showCard: showCard
+    showCard: showCard,
+    pins: pins
   };
 })();

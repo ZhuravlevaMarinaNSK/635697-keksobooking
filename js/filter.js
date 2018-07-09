@@ -5,37 +5,35 @@
   var MAX_PRICE = 50000;
   var filter = document.querySelector('.map__filters');
   var anyValue = 'any';
-  var pins = [];
-  var inputsValues;
-  var disableForm = function (isDisabled) {
-    var inputs = filter.querySelectorAll('input, select');
-    inputs.forEach(function (item) {
-      item.disabled = isDisabled;
-    });
-  };
 
-  var getData = function (info) {
-    pins = info.slice();
-    disableForm(false);
-  };
-
-  var getInfo = function () {
+  var getInfo = function (datum) {
     var data = {
       type: filter.querySelector('#housing-type').value,
       price: filter.querySelector('#housing-price').value,
       rooms: filter.querySelector('#housing-rooms').value,
       guests: filter.querySelector('#housing-guests').value
     };
-    return data;
+    return data[datum];
   };
 
   var checkDataField = function (item, name) {
-    return inputsValues[name] === anyValue ? true : inputsValues[name] === item.offer[name].toString();
+    var value = getInfo(name);
+    if (value !== anyValue) {
+      switch (name) {
+        case 'guests':
+          return value <= item.offer[name].toString();
+        default:
+          return value === item.offer[name].toString();
+      }
+    } else {
+      return true;
+    }
   };
 
   var checkPricefield = function (item, name) {
-    if (inputsValues[name] !== anyValue) {
-      switch (inputsValues[name]) {
+    var value = getInfo(name);
+    if (value !== anyValue) {
+      switch (value) {
         case 'low':
           return item.offer.price < MIN_PRICE;
         case 'middle':
@@ -70,15 +68,7 @@
     return checkDataField(it, 'type') && checkDataField(it, 'guests') && checkDataField(it, 'rooms') && checkPricefield(it, 'price') && checkFeaturesfield(it);
   };
 
-  var getSortedPins = function () {
-    inputsValues = getInfo();
-    var pinsData = pins.filter(sortPins);
-    return pinsData;
-  };
-
   window.filter = {
-    getSortedPins: getSortedPins,
-    getData: getData,
-    disableForm: disableForm
+    sortPins: sortPins
   };
 })();
