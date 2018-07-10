@@ -45,15 +45,10 @@
 
   var createPins = function (ads) {
     var fragmentPin = document.createDocumentFragment();
-    if (ads.length > 0 && ads.length > 5) {
-      for (var i = 0; i < 5; i++) {
-        fragmentPin.appendChild(renderPin(ads[i]));
-      }
-    } else if (ads.length > 0 && ads.length < 5) {
-      ads.forEach(function (item) {
-        fragmentPin.appendChild(renderPin(item));
-      });
-    }
+    var arr = ads.slice(0, 4);
+    arr.forEach(function (item) {
+      fragmentPin.appendChild(renderPin(item));
+    });
     document.querySelector('.map__pins').appendChild(fragmentPin);
     return;
   };
@@ -76,6 +71,10 @@
     return (homeTypes[homeType]);
   };
 
+  var checkEmptiness = function (item, block, action) {
+    return item.length !== 0 ? block.appendChild(action(item)) : block.classList.add('visually-hidden');
+  };
+
   var renderAd = function (ad) {
     var adElement = similarPopupTemplate.querySelector('.map__card').cloneNode(true);
 
@@ -91,10 +90,9 @@
     var photosBlock = adElement.querySelector('.popup__photos');
     var featuresBlock = adElement.querySelector('.popup__features');
 
-    photosBlock.innerText = '';
-    featuresBlock.innerText = '';
-    featuresBlock.appendChild(renderFeatureList(ad.offer.features));
-    photosBlock.appendChild(renderPhotoList(ad.offer.photos));
+    checkEmptiness(ad.offer.features, featuresBlock, renderFeatureList);
+    checkEmptiness(ad.offer.photos, photosBlock, renderPhotoList);
+
     adElement.querySelector('.popup__description').textContent = ad.offer.description;
     return adElement;
   };

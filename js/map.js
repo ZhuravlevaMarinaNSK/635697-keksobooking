@@ -22,9 +22,9 @@
     if (isDisabled) {
       k = 0;
     }
-    var top = mainPin.offsetTop + window.utils.pinHeight / 2 + (window.utils.pinHeight / 2 + window.utils.mainPinTail) * k;
+    var top = mainPin.offsetTop + window.utils.pinHeight / 2 + (window.utils.pinHeight * 2 + window.utils.mainPinTail) * k;
     var left = mainPin.offsetLeft + window.utils.pinWidth / 2;
-    var coordinates = top + ', ' + left;
+    var coordinates = left + ', ' + top;
     adForm.querySelector('#address').value = coordinates;
   };
 
@@ -85,6 +85,7 @@
     submit.addEventListener('click', window.formValidation.onSubmitClick);
     allFilters.addEventListener('change', onChangeFilter);
     disableForm(true);
+    document.addEventListener('click', onPinClick);
   };
 
   mainPin.addEventListener('mousedown', onMainPinClick);
@@ -122,13 +123,30 @@
     document.addEventListener('keydown', onPopupEscPress);
   };
 
+  var desactivatePin = function () {
+    var allPins = document.querySelectorAll('.map__pin');
+    allPins.forEach(function (it) {
+      if (it.classList.contains('.map__pin--active')) {
+        it.classList.remove('map__pin--active');
+      }
+    });
+  };
+
+  var onPinClick = function (evt) {
+    desactivatePin();
+    var target = evt.target;
+    if (target.closest('.map__pin:not(.map__pin--main') && !target.classList.contains('.map__pin--active')) {
+      target.parentElement.classList.add('map__pin--active');
+    }
+  };
+
   var updatePins = function () {
     var mapCard = document.querySelector('.map__card');
     if (mapCard) {
       closePopup();
     }
     window.createCards.removePins();
-    var pinsData = pins.filter(window.filter.sortPins);
+    var pinsData = window.filter.sortPins(pins);
     window.createCards.createPins(pinsData);
   };
 
@@ -151,8 +169,9 @@
 
   window.map = {
     toggleMapFormDisable: toggleMapFormDisable,
-    onMainPinClick: onMainPinClick,
     getMainPinPosition: getMainPinPosition,
+    onMainPinClick: onMainPinClick,
+    onPinClick: onPinClick,
     closePopup: closePopup,
     showCard: showCard,
     pins: pins

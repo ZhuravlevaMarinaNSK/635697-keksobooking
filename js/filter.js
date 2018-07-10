@@ -64,8 +64,11 @@
     return result;
   };
 
-  var sortPins = function (it) {
-    return checkDataField(it, 'type') && checkDataField(it, 'guests') && checkDataField(it, 'rooms') && checkPricefield(it, 'price') && checkFeaturesfield(it);
+  var sortPins = function (pins) {
+    var pinsData = pins.filter(function (it) {
+      return checkDataField(it, 'type') && checkDataField(it, 'guests') && checkDataField(it, 'rooms') && checkPricefield(it, 'price') && checkFeaturesfield(it);
+    });
+    return pinsData;
   };
 
   window.filter = {
