@@ -4,28 +4,28 @@
   var similarPopupTemplate = document.querySelector('template')
   .content;
 
-  var renderFeatureList = function (item) {
+  var renderFeatureList = function (items) {
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < item.length; i++) {
+    items.forEach(function (item) {
       var featureItem = document.createElement('li');
       featureItem.classList.add('popup__feature');
-      featureItem.classList.add('popup__feature--' + item[i]);
+      featureItem.classList.add('popup__feature--' + item);
       fragment.appendChild(featureItem);
-    }
+    });
     return fragment;
   };
 
-  var renderPhotoList = function (item) {
+  var renderPhotoList = function (items) {
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < item.length; i++) {
+    items.forEach(function (item) {
       var photoFragment = document.createElement('img');
-      photoFragment.setAttribute('src', item[i]);
+      photoFragment.setAttribute('src', item);
       photoFragment.alt = 'фотография жилья';
       photoFragment.width = '45';
       photoFragment.height = '40';
       photoFragment.classList.add('popup__photo');
       fragment.appendChild(photoFragment);
-    }
+    });
     return fragment;
   };
 
@@ -35,28 +35,35 @@
     adElement.classList.add('map__pin');
     adElement.style.left = ad.location.x - window.utils.pinWidth / 2 + 'px';
     adElement.style.top = ad.location.y - window.utils.pinHeight + 'px';
-
     adElement.querySelector('img').setAttribute('src', ad.author.avatar);
     adElement.querySelector('img').setAttribute('alt', ad.offer.title);
-
     adElement.addEventListener('click', function () {
-      window.showCard(document.querySelector('.map'), ad);
+      window.map.showCard(document.querySelector('.map'), ad);
     });
-
     return adElement;
   };
 
   var createPins = function (ads) {
     var fragmentPin = document.createDocumentFragment();
-
-    for (var i = 0; i < 8; i++) {
-      var randomIndex = window.utils.getRandom(0, ads.length - 1);
-      var randomAd = ads[randomIndex];
-      ads.splice(randomIndex, 1);
-
-      fragmentPin.appendChild(renderPin(randomAd));
+    if (ads.length > 0 && ads.length > 5) {
+      for (var i = 0; i < 5; i++) {
+        fragmentPin.appendChild(renderPin(ads[i]));
+      }
+    } else if (ads.length > 0 && ads.length < 5) {
+      ads.forEach(function (item) {
+        fragmentPin.appendChild(renderPin(item));
+      });
     }
     document.querySelector('.map__pins').appendChild(fragmentPin);
+    return;
+  };
+
+  var removePins = function () {
+    var mapPins = document.querySelector('.map__pins');
+    var allPins = mapPins.querySelectorAll('.map__pin:not(.map__pin--main)');
+    allPins.forEach(function (item) {
+      mapPins.removeChild(item);
+    });
   };
 
   var getHomeType = function (homeType) {
@@ -86,17 +93,15 @@
 
     photosBlock.innerText = '';
     featuresBlock.innerText = '';
-
     featuresBlock.appendChild(renderFeatureList(ad.offer.features));
     photosBlock.appendChild(renderPhotoList(ad.offer.photos));
-
     adElement.querySelector('.popup__description').textContent = ad.offer.description;
-
     return adElement;
   };
 
   window.createCards = {
     createPins: createPins,
-    renderAd: renderAd
+    renderAd: renderAd,
+    removePins: removePins
   };
 })();

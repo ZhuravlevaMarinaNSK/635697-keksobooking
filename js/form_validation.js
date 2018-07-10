@@ -5,6 +5,7 @@
   var adForm = document.querySelector('.ad-form');
   var priceInput = adForm.querySelector('#price');
   var typeInput = adForm.querySelector('#type');
+  var formInputs = adForm.querySelectorAll('select, input, checkbox, textarea');
   var guestNumberInput = adForm.querySelector('#capacity');
   var mainPin = document.querySelector('.map__pin--main');
   var map = document.querySelector('.map');
@@ -31,11 +32,7 @@
   };
 
   var onTypeInput = function () {
-    if (!priceInput.validity.valid) {
-      highlightBorderError(priceInput);
-    } else {
-      unhighlightBorderError(priceInput);
-    }
+    return priceInput.validity.valid === true ? unhighlightBorderError(priceInput) : highlightBorderError(priceInput);
   };
 
   var highlightBorderError = function (element) {
@@ -46,7 +43,7 @@
     element.style.borderColor = '#d9d9d3';
   };
 
-  var roomCheck = function () {
+  var onRoomChange = function () {
     var arr = window.utils.guestRooms[roomNumberInput.value].slice();
     guestNumberInput.setCustomValidity('');
     if (arr.indexOf(parseInt(guestNumberInput.value, 10)) < 0) {
@@ -58,11 +55,11 @@
   };
 
   roomNumberInput.addEventListener('change', function () {
-    roomCheck();
+    onRoomChange();
   });
 
   guestNumberInput.addEventListener('change', function () {
-    roomCheck();
+    onRoomChange();
   });
 
   var timeCheckinInput = document.querySelector('#timein');
@@ -77,24 +74,49 @@
   };
 
   var success = document.querySelector('.success');
+  success.style.zIndex = 1000;
   success.classList.add('hidden');
 
+  var resetForm = function () {
+    for (var i = 0; i < formInputs.length; i++) {
+      var fieldType = formInputs[i].type.toLowerCase();
+      switch (fieldType) {
+        case 'text':
+        case 'textarea':
+        case 'number':
+        case 'file':
+          formInputs[i].value = '';
+          break;
+        case 'checkbox':
+          if (formInputs[i].checked) {
+            formInputs[i].checked = false;
+          }
+          break;
+        case 'select-one':
+        case 'select-multi':
+          formInputs[i].selectedIndex = 0;
+          break;
+        default:
+          break;
+      }
+    }
+    typeInput.selectedIndex = 1;
+  };
+
   var onSubmitClick = function (evt) {
-    roomCheck();
+    onRoomChange();
     if (userTitleInput.checkValidity() && priceInput.checkValidity() && roomNumberInput.checkValidity() && guestNumberInput.checkValidity()) {
       evt.preventDefault();
       window.map.toggleMapFormDisable(true);
       var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
-      for (var i = 0; i < pinsForDelete.length; i++) {
-        document.querySelector('.map__pins').removeChild(pinsForDelete[i]);
-      }
-
-      adForm.reset();
-      window.map.getMainPinPosition();
+      pinsForDelete.forEach(function (item) {
+        document.querySelector('.map__pins').removeChild(item);
+      });
+      resetForm();
+      window.map.getMainPinPosition(true);
       mainPin.addEventListener('mouseup', window.map.onMainPinClick);
-      success.classList.remove('hidden');
       document.addEventListener('keydown', onSuccessEscPress);
-      success.addEventListener('click', closeSuccessMessage);
+      success.addEventListener('click', onSuccessMessageClick);
       window.backend.uploadFunction(new FormData(adForm), showSuccessMessage, window.utils.error);
     }
   };
@@ -128,10 +150,10 @@
     }
   };
 
-  var closeSuccessMessage = function () {
+  var onSuccessMessageClick = function () {
     success.classList.add('hidden');
     document.removeEventListener('keydown', onSuccessEscPress);
-    success.removeEventListener('click', closeSuccessMessage);
+    success.removeEventListener('click', onSuccessMessageClick);
   };
 
   var showSuccessMessage = function () {
@@ -145,17 +167,17 @@
     }
     window.map.toggleMapFormDisable(true);
     var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
-    for (var i = 0; i < pinsForDelete.length; i++) {
-      document.querySelector('.map__pins').removeChild(pinsForDelete[i]);
-    }
-    adForm.reset();
-    window.map.getMainPinPosition();
-    mainPin.addEventListener('mouseup', window.map.onMainPinClick);
+    pinsForDelete.forEach(function (item) {
+      document.querySelector('.map__pins').removeChild(item);
+    });
+    resetForm();
+    window.map.getMainPinPosition(true);
+    mainPin.addEventListener('mousedown', window.map.onMainPinClick);
   };
 
   var onSuccessEscPress = function (evt) {
     if (evt.keyCode === window.utils.esqKeycode) {
-      closeSuccessMessage();
+      onSuccessMessageClick();
     }
   };
 

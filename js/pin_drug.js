@@ -1,27 +1,21 @@
 'use strict';
 
 (function () {
-  var TOP_EDGE = 130;
-  var BOTTOM_EDGE = 630;
-  var LEFT_EDGE = 0;
-
   var pins = document.querySelector('.map__pins');
   var adForm = document.querySelector('.ad-form');
   var mainPin = document.querySelector('.map__pin--main');
-  var rightEdge = pins.offsetWidth - mainPin.offsetWidth;
 
+  mainPin.style.zIndex = 100;
   mainPin.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
-
     var startCoords = {
       x: evt.clientX,
       y: evt.clientY
     };
-
     var dragged = false;
 
-
     var onMouseMove = function (moveEvt) {
+      var RIGHT_EDGE = pins.offsetWidth - mainPin.offsetWidth;
       moveEvt.preventDefault();
       dragged = true;
 
@@ -29,7 +23,6 @@
         x: startCoords.x - moveEvt.clientX,
         y: startCoords.y - moveEvt.clientY
       };
-
       startCoords = {
         x: moveEvt.clientX,
         y: moveEvt.clientY
@@ -38,17 +31,16 @@
       var currentX = mainPin.offsetLeft - shift.x;
       var currentY = mainPin.offsetTop - shift.y;
 
-
-      if (currentY < TOP_EDGE) {
-        currentY = TOP_EDGE;
-      } else if (currentY > BOTTOM_EDGE) {
-        currentY = BOTTOM_EDGE;
+      if (currentY < window.utils.top) {
+        currentY = window.utils.top;
+      } else if (currentY > window.utils.bottom) {
+        currentY = window.utils.bottom;
       }
 
-      if (currentX < LEFT_EDGE) {
-        currentX = LEFT_EDGE;
-      } else if (currentX > rightEdge) {
-        currentX = rightEdge;
+      if (currentX < window.utils.left) {
+        currentX = window.utils.left;
+      } else if (currentX > RIGHT_EDGE) {
+        currentX = RIGHT_EDGE;
       }
 
       mainPin.style.top = currentY + 'px';
@@ -58,7 +50,6 @@
 
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
-
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('mouseup', onMouseUp);
 
@@ -69,7 +60,6 @@
         };
         mainPin.addEventListener('click', onClickPreventDefault);
       }
-
     };
 
     document.addEventListener('mousemove', onMouseMove);

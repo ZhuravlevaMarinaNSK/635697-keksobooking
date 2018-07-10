@@ -12,6 +12,10 @@
   var ESC_KEYCODE = 27;
   var ENTER_KEYCODE = 13;
   var MAIN_PIN_TAIL = 22;
+  var DEBOUNCE_INTERVAL = 300;
+  var TOP_EDGE = 130;
+  var BOTTOM_EDGE = 630;
+  var LEFT_EDGE = 0;
 
   var GUEST_ROOMS = {
     1: [1],
@@ -29,10 +33,24 @@
     node.style.top = '100px';
     node.style.bottom = '300px';
     node.style.fontSize = '30px';
+    node.style.zIndex = 2000;
     node.classList.add('error-message');
 
     node.textContent = 'Что-то пошло не так ¯\_(ツ)_/¯ ' + errorMessage;
     document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  var debounce = function (fun) {
+    var lastTimeout = null;
+    return function () {
+      var args = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        fun.apply(null, args);
+      }, DEBOUNCE_INTERVAL);
+    };
   };
 
   window.utils = {
@@ -44,11 +62,15 @@
     numberOfAds: NUMBER_OF_ADS,
     pinHeight: PIN_HEIGHT,
     pinWidth: PIN_WIDTH,
+    top: TOP_EDGE,
+    bottom: BOTTOM_EDGE,
+    left: LEFT_EDGE,
     escKeycode: ESC_KEYCODE,
     enterKeycode: ENTER_KEYCODE,
     mainPinTail: MAIN_PIN_TAIL,
     guestRooms: GUEST_ROOMS,
     error: errorHandler,
+    debounce: debounce,
     getRandom: function (min, max) {
       return Math.floor(Math.random() * (max + 1 - min) + min);
     },
