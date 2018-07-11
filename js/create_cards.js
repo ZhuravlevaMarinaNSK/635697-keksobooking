@@ -58,6 +58,12 @@
       window.map.showCard(document.querySelector('.map'), ad);
       document.addEventListener('click', onPinClick);
     });
+    adElement.addEventListener('keydown', function (evt) {
+      if (evt.keyCode === window.utils.enterKeycode) {
+        window.map.showCard(document.querySelector('.map'), ad);
+        adElement.classList.add('map__pin--active');
+      }
+    });
     return adElement;
   };
 
