@@ -114,7 +114,6 @@
       });
       resetForm();
       window.map.getMainPinPosition(true);
-      document.removeEventListener('click', window.map.onPinClick);
       mainPin.addEventListener('mouseup', window.map.onMainPinClick);
       document.addEventListener('keydown', onSuccessEscPress);
       success.addEventListener('click', onSuccessMessageClick);
@@ -173,7 +172,6 @@
     });
     resetForm();
     window.map.getMainPinPosition(true);
-    document.removeEventListener('click', window.map.onPinClick);
     mainPin.addEventListener('mousedown', window.map.onMainPinClick);
   };
 

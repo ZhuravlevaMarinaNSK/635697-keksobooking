@@ -29,6 +29,23 @@
     return fragment;
   };
 
+  var desactivatePin = function () {
+    var allPins = document.querySelectorAll('.map__pin');
+    allPins.forEach(function (it) {
+      if (it.classList.contains('map__pin--active')) {
+        it.classList.remove('map__pin--active');
+      }
+    });
+  };
+
+  var onPinClick = function (evt) {
+    desactivatePin();
+    var target = evt.target;
+    if (target.closest('.map__pin:not(.map__pin--main') && !target.classList.contains('.map__pin--active') && (target.tagName === 'IMG')) {
+      target.parentElement.classList.add('map__pin--active');
+    }
+  };
+
   var renderPin = function (ad) {
     var adElement = similarPopupTemplate.querySelector('.map__pin').cloneNode(true);
 
@@ -39,6 +56,7 @@
     adElement.querySelector('img').setAttribute('alt', ad.offer.title);
     adElement.addEventListener('click', function () {
       window.map.showCard(document.querySelector('.map'), ad);
+      document.addEventListener('click', onPinClick);
     });
     return adElement;
   };
@@ -59,6 +77,7 @@
     allPins.forEach(function (item) {
       mapPins.removeChild(item);
     });
+    document.removeEventListener('click', onPinClick);
   };
 
   var getHomeType = function (homeType) {
@@ -89,6 +108,9 @@
 
     var photosBlock = adElement.querySelector('.popup__photos');
     var featuresBlock = adElement.querySelector('.popup__features');
+
+    photosBlock.innerText = '';
+    featuresBlock.innerText = '';
 
     checkEmptiness(ad.offer.features, featuresBlock, renderFeatureList);
     checkEmptiness(ad.offer.photos, photosBlock, renderPhotoList);
