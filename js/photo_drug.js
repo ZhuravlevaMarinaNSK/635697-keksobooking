@@ -1,13 +1,14 @@
 'use strict';
 
 (function () {
-  var containerPhotos = document.querySelector('.ad-form__photo');
+  var containerPhotos = document.querySelector('.ad-form__photo-container');
   var draggedItem;
   var dropZone = document.querySelector('.ad-form__drop-zone');
 
   dropZone.addEventListener('dragenter', function (evt) {
     evt.preventDefault();
     evt.target.style.opacity = 0.5;
+    containerPhotos.classList.remove('visually-hidden');
   });
 
   dropZone.addEventListener('dragleave', function (evt) {

@@ -4,6 +4,7 @@
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
   var IMAGE_WIDTH = 70;
   var IMAGE_HEIGHT = 70;
+  var MARGIN_LEFT = 5;
   var fileChooser = document.querySelector('.ad-form__field input[type=file]');
   var preview = document.querySelector('.ad-form-header__preview img');
 
@@ -30,22 +31,25 @@
   };
 
   var fileChooserPhotos = document.querySelector('.ad-form__upload input[type=file]');
-  var previewPhotos = document.querySelector('.ad-form__photo');
+  var container = document.querySelector('.ad-form__photo-container');
+  var photos = document.querySelector('.ad-form__photo');
 
   var addPhotos = function (element) {
     var div = document.createDocumentFragment();
     var img = document.createElement('img');
-    img.classList.add('ad-form__image');
+    img.classList.add('ad-form__photo');
     img.alt = 'Фотография жилья';
     img.width = IMAGE_WIDTH;
     img.height = IMAGE_HEIGHT;
+    img.style.marginLeft = MARGIN_LEFT + 'px';
     loadFile(element, img);
     div.appendChild(img);
     return div;
   };
 
   fileChooserPhotos.addEventListener('change', function () {
-    previewPhotos.appendChild(addPhotos(fileChooserPhotos));
+    photos.classList.add('visually-hidden');
+    container.appendChild(addPhotos(fileChooserPhotos));
   });
 
   var dropZone = document.querySelector('.ad-form-header__drop-zone');

@@ -105,6 +105,7 @@
     var popup = map.querySelector('.popup');
     var popupClose = document.querySelector('.popup__close');
     map.removeChild(popup);
+    window.createCards.desactivatePin();
     document.removeEventListener('keydown', onPopupEscPress);
     popupClose.removeEventListener('click', closePopup);
     popupClose.removeEventListener('keydown', onPopupCloseEnterPress);

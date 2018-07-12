@@ -127,6 +127,7 @@
   window.createCards = {
     createPins: createPins,
     renderAd: renderAd,
-    removePins: removePins
+    removePins: removePins,
+    desactivatePin: desactivatePin
   };
 })();
