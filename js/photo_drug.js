@@ -1,9 +1,10 @@
 'use strict';
 
 (function () {
-  var containerPhotos = document.querySelector('.ad-form__photo-container');
+  var form = document.querySelector('.ad-form');
+  var containerPhotos = form.querySelector('.ad-form__photo-container');
+  var dropZone = form.querySelector('.ad-form__drop-zone');
   var draggedItem;
-  var dropZone = document.querySelector('.ad-form__drop-zone');
 
   dropZone.addEventListener('dragenter', function (evt) {
     evt.preventDefault();

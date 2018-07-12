@@ -5,8 +5,13 @@
   var IMAGE_WIDTH = 70;
   var IMAGE_HEIGHT = 70;
   var MARGIN_LEFT = 5;
-  var fileChooser = document.querySelector('.ad-form__field input[type=file]');
-  var preview = document.querySelector('.ad-form-header__preview img');
+  var form = document.querySelector('.ad-form');
+  var fileChooser = form.querySelector('.ad-form__field input[type=file]');
+  var fileChooserPhotos = form.querySelector('.ad-form__upload input[type=file]');
+  var container = form.querySelector('.ad-form__photo-container');
+  var photos = form.querySelector('.ad-form__photo');
+  var dropZone = form.querySelector('.ad-form-header__drop-zone');
+  var preview = form.querySelector('.ad-form-header__preview img');
 
   fileChooser.addEventListener('change', function () {
     loadFile(fileChooser, preview);
@@ -30,10 +35,6 @@
     return reader;
   };
 
-  var fileChooserPhotos = document.querySelector('.ad-form__upload input[type=file]');
-  var container = document.querySelector('.ad-form__photo-container');
-  var photos = document.querySelector('.ad-form__photo');
-
   var addPhotos = function (element) {
     var div = document.createDocumentFragment();
     var img = document.createElement('img');
@@ -51,8 +52,6 @@
     photos.classList.add('visually-hidden');
     container.appendChild(addPhotos(fileChooserPhotos));
   });
-
-  var dropZone = document.querySelector('.ad-form-header__drop-zone');
 
   dropZone.addEventListener('dragenter', function (evt) {
     evt.preventDefault();

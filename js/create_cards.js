@@ -85,13 +85,14 @@
     document.removeEventListener('click', onPinClick);
   };
 
+  var homeTypes = {
+    'flat': 'Квартира',
+    'palace': 'Дворец',
+    'house': 'Дом',
+    'bungalo': 'Бунгало'
+  };
+
   var getHomeType = function (homeType) {
-    var homeTypes = {
-      'flat': 'Квартира',
-      'palace': 'Дворец',
-      'house': 'Дом',
-      'bungalo': 'Бунгало'
-    };
     return (homeTypes[homeType]);
   };
 
