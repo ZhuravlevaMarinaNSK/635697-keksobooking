@@ -40,7 +40,7 @@
 
   var onPinClick = function (evt) {
     var target;
-    if (evt.target.tagName === 'BUTTON' && evt.target !== document.querySelector('.map__pin--main') && evt.target !== document.querySelector('.popup__close')) {
+    if (evt.target.tagName === 'BUTTON' && evt.target !== document.querySelector('.popup__close') && evt.target !== document.querySelector('.map__pin--main')) {
       target = evt.target;
     } else if (evt.target.parentNode.tagName === 'BUTTON' && evt.target.parentNode !== document.querySelector('.map__pin--main')) {
       target = evt.target.parentNode;
