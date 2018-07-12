@@ -39,9 +39,9 @@
   };
 
   var onPinClick = function (evt) {
-    desactivatePin();
     var target = evt.target;
     if (target.closest('.map__pin:not(.map__pin--main') && !target.classList.contains('.map__pin--active') && (target.tagName === 'IMG')) {
+      desactivatePin();
       target.parentElement.classList.add('map__pin--active');
     }
   };
@@ -59,6 +59,7 @@
       document.addEventListener('click', onPinClick);
     });
     adElement.addEventListener('keydown', function (evt) {
+      adElement.classList.remove('map__pin--active');
       if (evt.keyCode === window.utils.enterKeycode) {
         window.map.showCard(document.querySelector('.map'), ad);
         adElement.classList.add('map__pin--active');
