@@ -39,10 +39,15 @@
   };
 
   var onPinClick = function (evt) {
-    var target = evt.target;
-    if (target.closest('.map__pin:not(.map__pin--main') && !target.classList.contains('.map__pin--active') && (target.tagName === 'IMG')) {
+    var target;
+    if (evt.target.tagName === 'BUTTON' && evt.target !== document.querySelector('.map__pin--main') && evt.target !== document.querySelector('.popup__close')) {
+      target = evt.target;
+    } else if (evt.target.parentNode.tagName === 'BUTTON' && evt.target.parentNode !== document.querySelector('.map__pin--main')) {
+      target = evt.target.parentNode;
+    }
+    if (target) {
       desactivatePin();
-      target.parentElement.classList.add('map__pin--active');
+      target.classList.add('map__pin--active');
     }
   };
 
@@ -59,7 +64,6 @@
       document.addEventListener('click', onPinClick);
     });
     adElement.addEventListener('keydown', function (evt) {
-      adElement.classList.remove('map__pin--active');
       if (evt.keyCode === window.utils.enterKeycode) {
         window.map.showCard(document.querySelector('.map'), ad);
         adElement.classList.add('map__pin--active');
