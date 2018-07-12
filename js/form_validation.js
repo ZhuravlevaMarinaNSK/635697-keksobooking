@@ -1,14 +1,18 @@
 'use strict';
 
 (function () {
-  var roomNumberInput = document.querySelector('#room_number');
   var adForm = document.querySelector('.ad-form');
+  var roomNumberInput = adForm.querySelector('#room_number');
   var priceInput = adForm.querySelector('#price');
   var typeInput = adForm.querySelector('#type');
   var formInputs = adForm.querySelectorAll('select, input, checkbox, textarea');
   var guestNumberInput = adForm.querySelector('#capacity');
-  var mainPin = document.querySelector('.map__pin--main');
   var map = document.querySelector('.map');
+  var mainPin = map.querySelector('.map__pin--main');
+  var avatarZone = adForm.querySelector('.ad-form__field');
+  var avatar = adForm.querySelector('.ad-form-header__preview img');
+  var containerPhotos = adForm.querySelector('.ad-form__photo-container');
+  var previewPhoto = containerPhotos.querySelector('.ad-form__photo');
 
   var onTypeChange = function () {
     switch (typeInput.value) {
@@ -84,8 +88,17 @@
         case 'text':
         case 'textarea':
         case 'number':
-        case 'file':
           formInputs[i].value = '';
+          break;
+        case 'file':
+          if (formInputs[i].parentNode === avatarZone) {
+            avatar.src = 'img/muffin-grey.svg';
+          } else {
+            while (containerPhotos.lastChild.tagName === 'IMG') {
+              containerPhotos.removeChild(containerPhotos.lastChild);
+            }
+            previewPhoto.classList.remove('visually-hidden');
+          }
           break;
         case 'checkbox':
           if (formInputs[i].checked) {
@@ -112,11 +125,12 @@
         document.querySelector('.map__pins').removeChild(item);
       });
       window.backend.uploadFunction(new FormData(adForm), showSuccessMessage, window.utils.error);
+      window.map.toggleMapFormDisable(true);
+      resetForm();
       window.map.getMainPinPosition(true);
-      mainPin.addEventListener('mouseup', window.map.onMainPinClick);
+      mainPin.addEventListener('mousedown', window.map.onMainPinClick);
       document.addEventListener('keydown', onSuccessEscPress);
       success.addEventListener('click', onSuccessMessageClick);
-      window.map.toggleMapFormDisable(true);
     }
   };
 
@@ -153,7 +167,6 @@
     success.classList.add('hidden');
     document.removeEventListener('keydown', onSuccessEscPress);
     success.removeEventListener('click', onSuccessMessageClick);
-    resetForm();
   };
 
   var showSuccessMessage = function () {
@@ -176,7 +189,7 @@
   };
 
   var onSuccessEscPress = function (evt) {
-    if (evt.keyCode === window.utils.esqKeycode) {
+    if (evt.keyCode === window.utils.escKeycode) {
       onSuccessMessageClick();
     }
   };
