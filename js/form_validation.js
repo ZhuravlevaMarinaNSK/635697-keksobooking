@@ -135,6 +135,9 @@
       window.backend.uploadFunction(new FormData(adForm), showSuccessMessage, window.utils.error);
       window.map.toggleMapFormDisable(true);
       resetForm();
+      unhighlightBorderError(userTitleInput);
+      unhighlightBorderError(priceInput);
+      unhighlightBorderError(guestNumberInput);
       onTypeChange();
       window.map.getMainPinPosition(true);
       mainPin.addEventListener('mousedown', window.map.onMainPinClick);
