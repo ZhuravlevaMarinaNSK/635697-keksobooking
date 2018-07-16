@@ -7,9 +7,9 @@
   var MARGIN_LEFT = 5;
   var form = document.querySelector('.ad-form');
   var fileChooser = form.querySelector('.ad-form__field input[type=file]');
-  var fileChooserPhotos = form.querySelector('.ad-form__upload input[type=file]');
+  var fileChooserPhoto = form.querySelector('.ad-form__upload input[type=file]');
   var container = form.querySelector('.ad-form__photo-container');
-  var photos = form.querySelector('.ad-form__photo');
+  var photo = form.querySelector('.ad-form__photo');
   var dropZone = form.querySelector('.ad-form-header__drop-zone');
   var preview = form.querySelector('.ad-form-header__preview img');
 
@@ -35,7 +35,7 @@
     return reader;
   };
 
-  var addPhotos = function (element) {
+  var addPhoto = function (element) {
     var div = document.createDocumentFragment();
     var img = document.createElement('img');
     img.classList.add('ad-form__photo');
@@ -48,9 +48,9 @@
     return div;
   };
 
-  fileChooserPhotos.addEventListener('change', function () {
-    photos.classList.add('visually-hidden');
-    container.appendChild(addPhotos(fileChooserPhotos));
+  fileChooserPhoto.addEventListener('change', function () {
+    photo.classList.add('visually-hidden');
+    container.appendChild(addPhoto(fileChooserPhoto));
   });
 
   dropZone.addEventListener('dragenter', function (evt) {
@@ -75,6 +75,6 @@
   });
 
   window.avatar = {
-    addPhotos: addPhotos
+    addPhotos: addPhoto
   };
 })();

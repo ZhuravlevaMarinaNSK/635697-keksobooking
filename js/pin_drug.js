@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  var pins = document.querySelector('.map__pins');
+  var pinsContainer = document.querySelector('.map__pins');
   var adForm = document.querySelector('.ad-form');
   var mainPin = document.querySelector('.map__pin--main');
 
@@ -18,7 +18,7 @@
       var TOP_EDGE = 130 - window.utils.pinHeight - window.utils.mainPinTail;
       var BOTTOM_EDGE = 630 - window.utils.pinHeight - window.utils.mainPinTail;
       var LEFT_EDGE = 0;
-      var RIGHT_EDGE = pins.offsetWidth - mainPin.offsetWidth;
+      var RIGHT_EDGE = pinsContainer.offsetWidth - mainPin.offsetWidth;
       moveEvt.preventDefault();
       dragged = true;
 

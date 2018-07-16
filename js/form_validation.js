@@ -11,8 +11,8 @@
   var mainPin = map.querySelector('.map__pin--main');
   var avatarZone = adForm.querySelector('.ad-form__field');
   var avatar = adForm.querySelector('.ad-form-header__preview img');
-  var containerPhotos = adForm.querySelector('.ad-form__photo-container');
-  var previewPhoto = containerPhotos.querySelector('.ad-form__photo');
+  var containerPhoto = adForm.querySelector('.ad-form__photo-container');
+  var previewPhoto = containerPhoto.querySelector('.ad-form__photo');
 
   var onTypeChange = function () {
     switch (typeInput.value) {
@@ -94,8 +94,8 @@
           if (formInputs[i].parentNode === avatarZone) {
             avatar.src = 'img/muffin-grey.svg';
           } else {
-            while (containerPhotos.lastChild.tagName === 'IMG') {
-              containerPhotos.removeChild(containerPhotos.lastChild);
+            while (containerPhoto.lastChild.tagName === 'IMG') {
+              containerPhoto.removeChild(containerPhoto.lastChild);
             }
             previewPhoto.classList.remove('visually-hidden');
           }

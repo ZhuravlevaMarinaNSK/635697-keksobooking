@@ -21,7 +21,7 @@
     100: [0]
   };
 
-  var errorHandler = function (errorMessage) {
+  var onError = function (errorMessage) {
     var node = document.createElement('div');
     node.style = 'z-index: 100; padding: 50px 10px; margin: 0 auto; text-align: center; vertical-align: middle; background-color: #da641a; border: 15px dashed white';
     node.style.position = 'absolute';
@@ -66,7 +66,7 @@
     enterKeycode: ENTER_KEYCODE,
     mainPinTail: MAIN_PIN_TAIL,
     guestRooms: GUEST_ROOMS,
-    error: errorHandler,
+    error: onError,
     debounce: debounce
   };
 })();

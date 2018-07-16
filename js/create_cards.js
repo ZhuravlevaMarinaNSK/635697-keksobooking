@@ -66,7 +66,7 @@
     return adElement;
   };
 
-  var createPins = function (ads) {
+  var createPin = function (ads) {
     var fragmentPin = document.createDocumentFragment();
     var arr = ads.slice(0, 4);
     arr.forEach(function (item) {
@@ -85,15 +85,15 @@
     document.removeEventListener('click', onPinClick);
   };
 
-  var homeTypes = {
+  var homeType = {
     'flat': 'Квартира',
     'palace': 'Дворец',
     'house': 'Дом',
     'bungalo': 'Бунгало'
   };
 
-  var getHomeType = function (homeType) {
-    return (homeTypes[homeType]);
+  var getHomeType = function (types) {
+    return (homeType[types]);
   };
 
   var checkEmptiness = function (item, block, action) {
@@ -126,7 +126,7 @@
   };
 
   window.createCards = {
-    createPins: createPins,
+    createPins: createPin,
     renderAd: renderAd,
     removePins: removePins,
     desactivatePin: desactivatePin

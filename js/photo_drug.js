@@ -2,14 +2,14 @@
 
 (function () {
   var form = document.querySelector('.ad-form');
-  var containerPhotos = form.querySelector('.ad-form__photo-container');
+  var containerPhoto = form.querySelector('.ad-form__photo-container');
   var dropZone = form.querySelector('.ad-form__drop-zone');
   var draggedItem;
 
   dropZone.addEventListener('dragenter', function (evt) {
     evt.preventDefault();
     evt.target.style.opacity = 0.5;
-    containerPhotos.classList.remove('visually-hidden');
+    containerPhoto.classList.remove('visually-hidden');
   });
 
   dropZone.addEventListener('dragleave', function (evt) {
@@ -26,21 +26,21 @@
     evt.preventDefault();
     evt.target.style.opacity = '1';
     var image = evt.dataTransfer;
-    containerPhotos.appendChild(window.avatar.addPhotos(image));
+    containerPhoto.appendChild(window.avatar.addPhotos(image));
   });
 
-  containerPhotos.addEventListener('dragstart', function (evt) {
+  containerPhoto.addEventListener('dragstart', function (evt) {
     if (evt.target.tagName === 'IMG') {
       draggedItem = evt.target;
     }
   });
 
-  containerPhotos.addEventListener('dragover', function (evt) {
+  containerPhoto.addEventListener('dragover', function (evt) {
     evt.preventDefault();
     return false;
   });
 
-  containerPhotos.addEventListener('drop', function (evt) {
+  containerPhoto.addEventListener('drop', function (evt) {
     var target = evt.target;
     evt.preventDefault();
     if (target.tagName === 'IMG') {

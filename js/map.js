@@ -4,7 +4,7 @@
   var MAIN_PIN_LEFT = 570;
   var MAIN_PIN_TOP = 375;
   var map = document.querySelector('.map');
-  var allFilters = map.querySelector('.map__filters');
+  var filterForm = map.querySelector('.map__filters');
   var adForm = document.querySelector('.ad-form');
   var mainPin = map.querySelector('.map__pin--main');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
@@ -83,7 +83,7 @@
     timeCheckinInput.addEventListener('change', window.formValidation.ontimeCheckinChange);
     timeCheckoutInput.addEventListener('change', window.formValidation.ontimeCheckoutChange);
     submit.addEventListener('click', window.formValidation.onSubmitClick);
-    allFilters.addEventListener('change', onChangeFilter);
+    filterForm.addEventListener('change', onChangeFilter);
     disableForm(true);
   };
 
@@ -144,7 +144,7 @@
   };
 
   var disableForm = function (isDisabled) {
-    var inputs = allFilters.querySelectorAll('input, select');
+    var inputs = filterForm.querySelectorAll('input, select');
     inputs.forEach(function (item) {
       item.disabled = isDisabled;
     });
