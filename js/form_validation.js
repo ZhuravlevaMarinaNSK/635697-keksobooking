@@ -36,6 +36,7 @@
     }
   };
   onTypeChange();
+
   var onTypeInput = function () {
     return priceInput.validity.valid === true ? unhighlightBorderError(priceInput) : highlightBorderError(priceInput);
   };
@@ -195,6 +196,9 @@
       document.querySelector('.map__pins').removeChild(item);
     });
     window.map.getMainPinPosition(true);
+    unhighlightBorderError(userTitleInput);
+    unhighlightBorderError(priceInput);
+    unhighlightBorderError(guestNumberInput);
     mainPin.addEventListener('mousedown', window.map.onMainPinClick);
   };
 
