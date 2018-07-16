@@ -77,7 +77,6 @@
     priceInput.addEventListener('invalid', window.formValidation.onTypeInput);
     priceInput.addEventListener('input', window.formValidation.onTypeInput);
     typeInput.addEventListener('change', window.formValidation.onTypeChange);
-
     userTitleInput.addEventListener('invalid', window.formValidation.onTitleInputInvalid);
     userTitleInput.addEventListener('input', window.formValidation.onTitleInput);
     timeCheckinInput.addEventListener('change', window.formValidation.ontimeCheckinChange);

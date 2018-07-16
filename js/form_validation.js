@@ -38,7 +38,12 @@
   onTypeChange();
 
   var onTypeInput = function () {
-    return priceInput.validity.valid === true ? unhighlightBorderError(priceInput) : highlightBorderError(priceInput);
+    var checkRedBorder = function () {
+      if (priceInput.style.borderColor === 'red') {
+        unhighlightBorderError(priceInput);
+      }
+    };
+    return priceInput.validity.valid === true ? checkRedBorder() : highlightBorderError(priceInput);
   };
 
   var highlightBorderError = function (element) {
@@ -55,7 +60,7 @@
     if (arr.indexOf(parseInt(guestNumberInput.value, 10)) < 0) {
       guestNumberInput.setCustomValidity('Число комнат не соответствует количеству гостей');
       highlightBorderError(guestNumberInput);
-    } else {
+    } else if (guestNumberInput.style.borderColor === 'red') {
       unhighlightBorderError(guestNumberInput);
     }
   };
@@ -158,7 +163,7 @@
     } else if (userTitleInput.validity.valueMissing) {
       userTitleInput.setCustomValidity('Обязательное поле');
       highlightBorderError(userTitleInput);
-    } else {
+    } else if (userTitleInput.style.borderColor === 'red') {
       userTitleInput.setCustomValidity('');
       unhighlightBorderError(userTitleInput);
     }
@@ -171,7 +176,6 @@
       target.setCustomValidity('Имя должно состоять минимум из 5-ти символов');
     } else {
       target.setCustomValidity('');
-      unhighlightBorderError(userTitleInput);
     }
   };
 
