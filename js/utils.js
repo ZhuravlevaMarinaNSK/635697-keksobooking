@@ -35,6 +35,9 @@
 
     node.textContent = 'Что-то пошло не так ¯\_(ツ)_/¯ ' + errorMessage;
     document.body.insertAdjacentElement('afterbegin', node);
+    setTimeout(function () {
+      node.classList.add('hidden');
+    }, 5000);
   };
 
   var debounce = function (fun) {
