@@ -7,6 +7,7 @@
   var typeInput = adForm.querySelector('#type');
   var formInputs = adForm.querySelectorAll('select, input, checkbox, textarea');
   var guestNumberInput = adForm.querySelector('#capacity');
+  var addressInput = adForm.querySelector('#address');
   var map = document.querySelector('.map');
   var mainPin = map.querySelector('.map__pin--main');
   var avatarZone = adForm.querySelector('.ad-form__field');
@@ -88,7 +89,9 @@
         case 'text':
         case 'textarea':
         case 'number':
-          formInputs[i].value = '';
+          if (formInputs[i] !== addressInput) {
+            formInputs[i].value = '';
+          }
           break;
         case 'file':
           if (formInputs[i].parentNode === avatarZone) {
@@ -117,9 +120,13 @@
   };
 
   var onSubmitClick = function (evt) {
+    var popup = map.querySelector('.popup');
     onRoomChange();
     if (userTitleInput.checkValidity() && priceInput.checkValidity() && roomNumberInput.checkValidity() && guestNumberInput.checkValidity()) {
       evt.preventDefault();
+      if (popup) {
+        window.map.closePopup();
+      }
       var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
       pinsForDelete.forEach(function (item) {
         document.querySelector('.map__pins').removeChild(item);
@@ -173,17 +180,18 @@
     success.classList.remove('hidden');
   };
 
-  var onResetClick = function () {
+  var onResetClick = function (evt) {
     var popup = map.querySelector('.popup');
+    evt.preventDefault();
     if (popup) {
       window.map.closePopup();
     }
+    resetForm();
     window.map.toggleMapFormDisable(true);
     var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
     pinsForDelete.forEach(function (item) {
       document.querySelector('.map__pins').removeChild(item);
     });
-    resetForm();
     window.map.getMainPinPosition(true);
     mainPin.addEventListener('mousedown', window.map.onMainPinClick);
   };
