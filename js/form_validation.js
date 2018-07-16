@@ -35,7 +35,7 @@
         break;
     }
   };
-
+  onTypeChange();
   var onTypeInput = function () {
     return priceInput.validity.valid === true ? unhighlightBorderError(priceInput) : highlightBorderError(priceInput);
   };
@@ -134,6 +134,7 @@
       window.backend.uploadFunction(new FormData(adForm), showSuccessMessage, window.utils.error);
       window.map.toggleMapFormDisable(true);
       resetForm();
+      onTypeChange();
       window.map.getMainPinPosition(true);
       mainPin.addEventListener('mousedown', window.map.onMainPinClick);
       document.addEventListener('keydown', onSuccessEscPress);
@@ -187,6 +188,7 @@
       window.map.closePopup();
     }
     resetForm();
+    onTypeChange();
     window.map.toggleMapFormDisable(true);
     var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
     pinsForDelete.forEach(function (item) {
