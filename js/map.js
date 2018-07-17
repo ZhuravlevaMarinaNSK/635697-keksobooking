@@ -74,8 +74,6 @@
     mainPin.removeEventListener('mousedown', onMainPinClick);
     window.formValidation.onTypeChange();
     reset.addEventListener('click', window.formValidation.onResetClick);
-    priceInput.addEventListener('invalid', window.formValidation.onTypeInput);
-    priceInput.addEventListener('input', window.formValidation.onTypeInput);
     typeInput.addEventListener('change', window.formValidation.onTypeChange);
     userTitleInput.addEventListener('invalid', window.formValidation.onTitleInputInvalid);
     userTitleInput.addEventListener('input', window.formValidation.onTitleInput);

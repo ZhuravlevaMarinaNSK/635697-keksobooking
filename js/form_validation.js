@@ -37,13 +37,14 @@
   };
   onTypeChange();
 
+  var checkRedBorder = function (element) {
+    if (element.style.borderColor === 'red') {
+      unhighlightBorderError(element);
+    }
+  };
+
   var onTypeInput = function () {
-    var checkRedBorder = function () {
-      if (priceInput.style.borderColor === 'red') {
-        unhighlightBorderError(priceInput);
-      }
-    };
-    return priceInput.validity.valid === true ? checkRedBorder() : highlightBorderError(priceInput);
+    return priceInput.validity.valid === true ? checkRedBorder(priceInput) : highlightBorderError(priceInput);
   };
 
   var highlightBorderError = function (element) {
@@ -59,7 +60,9 @@
     guestNumberInput.setCustomValidity('');
     if (arr.indexOf(parseInt(guestNumberInput.value, 10)) < 0) {
       guestNumberInput.setCustomValidity('Число комнат не соответствует количеству гостей');
-      highlightBorderError(guestNumberInput);
+      if (guestNumberInput.style.borderColor !== 'red') {
+        highlightBorderError(guestNumberInput);
+      }
     } else if (guestNumberInput.style.borderColor === 'red') {
       unhighlightBorderError(guestNumberInput);
     }
@@ -128,6 +131,9 @@
   var onSubmitClick = function (evt) {
     var popup = map.querySelector('.popup');
     onRoomChange();
+    if (!priceInput.validity.valid) {
+      onTypeInput();
+    }
     if (userTitleInput.checkValidity() && priceInput.checkValidity() && roomNumberInput.checkValidity() && guestNumberInput.checkValidity()) {
       evt.preventDefault();
       if (popup) {
