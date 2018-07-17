@@ -75,7 +75,7 @@
     window.formValidation.onTypeChange();
     reset.addEventListener('click', window.formValidation.onResetClick);
     typeInput.addEventListener('change', window.formValidation.onTypeChange);
-    userTitleInput.addEventListener('invalid', window.formValidation.onTitleInputInvalid);
+
     userTitleInput.addEventListener('input', window.formValidation.onTitleInput);
     timeCheckinInput.addEventListener('change', window.formValidation.ontimeCheckinChange);
     timeCheckoutInput.addEventListener('change', window.formValidation.ontimeCheckoutChange);

@@ -134,6 +134,7 @@
     if (!priceInput.validity.valid) {
       onTypeInput();
     }
+    userTitleInput.addEventListener('invalid', onTitleInputInvalid);
     if (userTitleInput.checkValidity() && priceInput.checkValidity() && roomNumberInput.checkValidity() && guestNumberInput.checkValidity()) {
       evt.preventDefault();
       if (popup) {
@@ -172,13 +173,15 @@
     } else {
       userTitleInput.setCustomValidity('');
     }
-    userTitleInput.addEventListener('invalid', onTitleInputInvalid);
   };
 
   var onTitleInput = function (evt) {
     var target = evt.target;
     if (target.value.length < 5) {
       target.setCustomValidity('Имя должно состоять минимум из 5-ти символов');
+      if (userTitleInput.style.borderColor !== 'red') {
+        highlightBorderError(userTitleInput);
+      }
     } else if (userTitleInput.style.borderColor === 'red') {
       target.setCustomValidity('');
       unhighlightBorderError(userTitleInput);
