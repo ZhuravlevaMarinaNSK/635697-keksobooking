@@ -163,9 +163,8 @@
     } else if (userTitleInput.validity.valueMissing) {
       userTitleInput.setCustomValidity('Обязательное поле');
       highlightBorderError(userTitleInput);
-    } else if (userTitleInput.style.borderColor === 'red') {
+    } else {
       userTitleInput.setCustomValidity('');
-      unhighlightBorderError(userTitleInput);
     }
     userTitleInput.addEventListener('invalid', onTitleInputInvalid);
   };
@@ -174,8 +173,9 @@
     var target = evt.target;
     if (target.value.length < 5) {
       target.setCustomValidity('Имя должно состоять минимум из 5-ти символов');
-    } else {
+    } else if (userTitleInput.style.borderColor === 'red') {
       target.setCustomValidity('');
+      unhighlightBorderError(userTitleInput);
     }
   };
 
