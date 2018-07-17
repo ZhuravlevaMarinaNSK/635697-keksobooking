@@ -46,21 +46,22 @@
   var toggleMapFormDisable = function (isDisabled) {
     map.classList.toggle('map--faded', isDisabled);
     adForm.classList.toggle('ad-form--disabled', isDisabled);
-
     adFormFieldsets.forEach(function (item) {
       item.disabled = isDisabled;
     });
-
     getMainPinPosition(isDisabled);
-    mainPin.removeEventListener('mouseup', onMainPinClick);
-    priceInput.removeEventListener('invalid', window.formValidation.onTypeInput);
-    userTitleInput.removeEventListener('input', window.formValidation.onTitleInputInvalid);
-    typeInput.removeEventListener('change', window.formValidation.onTypeChange);
-    timeCheckinInput.removeEventListener('change', window.formValidation.ontimeCheckinChange);
-    timeCheckoutInput.removeEventListener('change', window.formValidation.ontimeCheckoutChange);
-    submit.removeEventListener('click', window.formValidation.onSubmitClick);
-    userTitleInput.removeEventListener('input', window.formValidation.onTitleInput);
-    setAnyForm();
+    if (isDisabled) {
+      document.removeEventListener('keydown', window.formValidation.onErrorEsc);
+      priceInput.removeEventListener('invalid', window.formValidation.onTypeInput);
+      priceInput.removeEventListener('input', window.formValidation.onTypeInput);
+      userTitleInput.removeEventListener('input', window.formValidation.onTitleInputInvalid);
+      typeInput.removeEventListener('change', window.formValidation.onTypeChange);
+      timeCheckinInput.removeEventListener('change', window.formValidation.ontimeCheckinChange);
+      timeCheckoutInput.removeEventListener('change', window.formValidation.ontimeCheckoutChange);
+      submit.removeEventListener('click', window.formValidation.onSubmitClick);
+      filterForm.removeEventListener('change', onChangeFilter);
+      setAnyForm();
+    }
     mainPin.style.left = MAIN_PIN_LEFT + 'px';
     mainPin.style.top = MAIN_PIN_TOP + 'px';
   };
@@ -72,11 +73,11 @@
     window.backend.loadFunction(getData, window.utils.error);
     window.backend.loadFunction(window.createCards.createPins, window.utils.error);
     mainPin.removeEventListener('mousedown', onMainPinClick);
+    typeInput.addEventListener('change', window.formValidation.onTypeChange);
     window.formValidation.onTypeChange();
+    document.addEventListener('keydown', window.formValidation.onErrorEsc);
     reset.addEventListener('click', window.formValidation.onResetClick);
     typeInput.addEventListener('change', window.formValidation.onTypeChange);
-
-    userTitleInput.addEventListener('input', window.formValidation.onTitleInput);
     timeCheckinInput.addEventListener('change', window.formValidation.ontimeCheckinChange);
     timeCheckoutInput.addEventListener('change', window.formValidation.ontimeCheckoutChange);
     submit.addEventListener('click', window.formValidation.onSubmitClick);

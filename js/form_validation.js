@@ -9,11 +9,12 @@
   var guestNumberInput = adForm.querySelector('#capacity');
   var addressInput = adForm.querySelector('#address');
   var map = document.querySelector('.map');
-  var mainPin = map.querySelector('.map__pin--main');
+  // var mainPin = map.querySelector('.map__pin--main');
   var avatarZone = adForm.querySelector('.ad-form__field');
   var avatar = adForm.querySelector('.ad-form-header__preview img');
   var containerPhoto = adForm.querySelector('.ad-form__photo-container');
   var previewPhoto = containerPhoto.querySelector('.ad-form__photo');
+  var reset = adForm.querySelector('.ad-form__reset');
 
   var onTypeChange = function () {
     switch (typeInput.value) {
@@ -35,7 +36,6 @@
         break;
     }
   };
-  onTypeChange();
 
   var checkRedBorder = function (element) {
     if (element.style.borderColor === 'red') {
@@ -43,8 +43,14 @@
     }
   };
 
+  var checkBlackBorder = function (element) {
+    if (element.style.borderColor !== 'red') {
+      highlightBorderError(priceInput);
+    }
+  };
+
   var onTypeInput = function () {
-    return priceInput.validity.valid === true ? checkRedBorder(priceInput) : highlightBorderError(priceInput);
+    return priceInput.validity.valid === true ? checkRedBorder(priceInput) : checkBlackBorder(priceInput);
   };
 
   var highlightBorderError = function (element) {
@@ -131,6 +137,8 @@
   var onSubmitClick = function (evt) {
     var popup = map.querySelector('.popup');
     onRoomChange();
+    priceInput.addEventListener('input', onTypeInput);
+    priceInput.addEventListener('invalid', onTypeInput);
     if (!priceInput.validity.valid) {
       onTypeInput();
     }
@@ -152,7 +160,6 @@
       unhighlightBorderError(guestNumberInput);
       onTypeChange();
       window.map.getMainPinPosition(true);
-      mainPin.addEventListener('mousedown', window.map.onMainPinClick);
       document.addEventListener('keydown', onSuccessEscPress);
       success.addEventListener('click', onSuccessMessageClick);
     }
@@ -172,19 +179,6 @@
       highlightBorderError(userTitleInput);
     } else {
       userTitleInput.setCustomValidity('');
-    }
-  };
-
-  var onTitleInput = function (evt) {
-    var target = evt.target;
-    if (target.value.length < 5) {
-      target.setCustomValidity('Имя должно состоять минимум из 5-ти символов');
-      if (userTitleInput.style.borderColor !== 'red') {
-        highlightBorderError(userTitleInput);
-      }
-    } else if (userTitleInput.style.borderColor === 'red') {
-      target.setCustomValidity('');
-      unhighlightBorderError(userTitleInput);
     }
   };
 
@@ -215,7 +209,7 @@
     unhighlightBorderError(userTitleInput);
     unhighlightBorderError(priceInput);
     unhighlightBorderError(guestNumberInput);
-    mainPin.addEventListener('mousedown', window.map.onMainPinClick);
+    reset.removeEventListener('click', onResetClick);
   };
 
   var onSuccessEscPress = function (evt) {
@@ -231,15 +225,13 @@
     }
   };
 
-  document.addEventListener('keydown', onErrorEsc);
-
   window.formValidation = {
     onTypeInput: onTypeInput,
     ontimeCheckinChange: ontimeCheckinChange,
     ontimeCheckoutChange: ontimeCheckoutChange,
     onSubmitClick: onSubmitClick,
+    onErrorEsc: onErrorEsc,
     onResetClick: onResetClick,
-    onTitleInput: onTitleInput,
     onTypeChange: onTypeChange,
     onTitleInputInvalid: onTitleInputInvalid
   };
