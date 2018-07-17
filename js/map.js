@@ -47,9 +47,9 @@
     map.classList.toggle('map--faded', isDisabled);
     adForm.classList.toggle('ad-form--disabled', isDisabled);
 
-    for (var k = 0; k < adFormFieldsets.length; k++) {
-      adFormFieldsets[k].disabled = isDisabled;
-    }
+    adFormFieldsets.forEach(function (item) {
+      item.disabled = isDisabled;
+    });
 
     getMainPinPosition(isDisabled);
     mainPin.removeEventListener('mouseup', onMainPinClick);

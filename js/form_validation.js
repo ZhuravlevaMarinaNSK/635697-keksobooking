@@ -89,18 +89,18 @@
   success.classList.add('hidden');
 
   var resetForm = function () {
-    for (var i = 0; i < formInputs.length; i++) {
-      var fieldType = formInputs[i].type.toLowerCase();
+    formInputs.forEach(function (item) {
+      var fieldType = item.type.toLowerCase();
       switch (fieldType) {
         case 'text':
         case 'textarea':
         case 'number':
-          if (formInputs[i] !== addressInput) {
-            formInputs[i].value = '';
+          if (item !== addressInput) {
+            item.value = item.defaultValue;
           }
           break;
         case 'file':
-          if (formInputs[i].parentNode === avatarZone) {
+          if (item.parentNode === avatarZone) {
             avatar.src = 'img/muffin-grey.svg';
           } else {
             while (containerPhoto.lastChild.tagName === 'IMG') {
@@ -110,18 +110,18 @@
           }
           break;
         case 'checkbox':
-          if (formInputs[i].checked) {
-            formInputs[i].checked = false;
+          if (item.checked) {
+            item.checked = false;
           }
           break;
         case 'select-one':
         case 'select-multi':
-          formInputs[i].selectedIndex = 0;
+          item.selectedIndex = 0;
           break;
         default:
           break;
       }
-    }
+    });
     typeInput.selectedIndex = 1;
   };
 
