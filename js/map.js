@@ -51,6 +51,7 @@
     });
     getMainPinPosition(isDisabled);
     mainPin.addEventListener('mousedown', onMainPinClick);
+    mainPin.addEventListener('keydown', onMainPinEnter);
     if (isDisabled) {
       document.removeEventListener('keydown', window.formValidation.onErrorEsc);
       priceInput.removeEventListener('invalid', window.formValidation.onTypeInput);
@@ -72,9 +73,10 @@
 
   var onMainPinClick = function () {
     toggleMapFormDisable(false);
-    window.backend.loadFunction(getData, window.utils.error);
+    window.backend.loadFunction(getData);
     window.backend.loadFunction(window.createCards.createPins, window.utils.error);
     mainPin.removeEventListener('mousedown', onMainPinClick);
+    mainPin.removeEventListener('keydown', onMainPinEnter);
     typeInput.addEventListener('change', window.formValidation.onTypeChange);
     window.formValidation.onTypeChange();
     document.addEventListener('keydown', window.formValidation.onErrorEsc);
@@ -88,6 +90,14 @@
   };
 
   mainPin.addEventListener('mousedown', onMainPinClick);
+
+  var onMainPinEnter = function (evt) {
+    if (evt.keyCode === window.utils.enterKeycode) {
+      onMainPinClick();
+    }
+  };
+
+  mainPin.addEventListener('keydown', onMainPinEnter);
 
   var onPopupCloseEnterPress = function (evt) {
     if (evt.keyCode === window.utils.enterKeycode) {

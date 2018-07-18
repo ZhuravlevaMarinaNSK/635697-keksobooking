@@ -86,9 +86,10 @@
     adForm.reset();
   };
 
-  var onSubmitClick = function (evt) {
+  var onSubmitClick = function (evt) {;
     evt.preventDefault();
     adForm.noValidate = false;
+
     var popup = map.querySelector('.popup');
     onRoomChange();
     roomNumberInput.addEventListener('change', function () {
@@ -117,7 +118,6 @@
       resetForm();
       onTypeChange();
       window.map.getMainPinPosition(true);
-      success.addEventListener('click', onSuccessMessageClick);
     }
   };
 
@@ -158,7 +158,9 @@
 
   var showSuccessMessage = function () {
     success.classList.remove('hidden');
-    document.addEventListener('keydown', onSuccessEscPress);
+    success.addEventListener('click', onSuccessMessageClick)
+    document.documentElement.focus();
+    document.addEventListener('keydown', onSuccessEscPress, false);
   };
 
   var onResetClick = function (evt) {
