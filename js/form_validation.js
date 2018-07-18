@@ -9,8 +9,6 @@
   var guestNumberInput = adForm.querySelector('#capacity');
   var addressInput = adForm.querySelector('#address');
   var map = document.querySelector('.map');
-  // var mainPin = map.querySelector('.map__pin--main');
-  var avatarZone = adForm.querySelector('.ad-form__field');
   var avatar = adForm.querySelector('.ad-form-header__preview img');
   var containerPhoto = adForm.querySelector('.ad-form__photo-container');
   var previewPhoto = containerPhoto.querySelector('.ad-form__photo');
@@ -37,28 +35,20 @@
     }
   };
 
-  var checkRedBorder = function (element) {
-    if (element.style.borderColor === 'red') {
-      unhighlightBorderError(element);
-    }
-  };
-
-  var checkBlackBorder = function (element) {
-    if (element.style.borderColor !== 'red') {
-      highlightBorderError(priceInput);
-    }
-  };
-
   var onTypeInput = function () {
-    return priceInput.validity.valid === true ? checkRedBorder(priceInput) : checkBlackBorder(priceInput);
+    return priceInput.validity.valid === true ? unhighlightBorderError(priceInput) : highlightBorderError(priceInput);
   };
 
   var highlightBorderError = function (element) {
-    element.style.borderColor = 'red';
+    if (element.style.borderColor !== 'red') {
+      element.style.borderColor = 'red';
+    }
   };
 
   var unhighlightBorderError = function (element) {
-    element.style.borderColor = '#d9d9d3';
+    if (element.style.borderColor === 'red') {
+      element.style.borderColor = '';
+    }
   };
 
   var onRoomChange = function () {
@@ -66,21 +56,11 @@
     guestNumberInput.setCustomValidity('');
     if (arr.indexOf(parseInt(guestNumberInput.value, 10)) < 0) {
       guestNumberInput.setCustomValidity('Число комнат не соответствует количеству гостей');
-      if (guestNumberInput.style.borderColor !== 'red') {
-        highlightBorderError(guestNumberInput);
-      }
-    } else if (guestNumberInput.style.borderColor === 'red') {
+      highlightBorderError(guestNumberInput);
+    } else {
       unhighlightBorderError(guestNumberInput);
     }
   };
-
-  roomNumberInput.addEventListener('change', function () {
-    onRoomChange();
-  });
-
-  guestNumberInput.addEventListener('change', function () {
-    onRoomChange();
-  });
 
   var timeCheckinInput = document.querySelector('#timein');
   var timeCheckoutInput = document.querySelector('#timeout');
@@ -98,45 +78,25 @@
   success.classList.add('hidden');
 
   var resetForm = function () {
-    formInputs.forEach(function (item) {
-      var fieldType = item.type.toLowerCase();
-      switch (fieldType) {
-        case 'text':
-        case 'textarea':
-        case 'number':
-          if (item !== addressInput) {
-            item.value = item.defaultValue;
-          }
-          break;
-        case 'file':
-          if (item.parentNode === avatarZone) {
-            avatar.src = 'img/muffin-grey.svg';
-          } else {
-            while (containerPhoto.lastChild.tagName === 'IMG') {
-              containerPhoto.removeChild(containerPhoto.lastChild);
-            }
-            previewPhoto.classList.remove('visually-hidden');
-          }
-          break;
-        case 'checkbox':
-          if (item.checked) {
-            item.checked = false;
-          }
-          break;
-        case 'select-one':
-        case 'select-multi':
-          item.selectedIndex = 0;
-          break;
-        default:
-          break;
-      }
-    });
-    typeInput.selectedIndex = 1;
+    avatar.src = 'img/muffin-grey.svg';
+    while (containerPhoto.lastChild.tagName === 'IMG') {
+      containerPhoto.removeChild(containerPhoto.lastChild);
+    }
+    previewPhoto.classList.remove('visually-hidden');
+    adForm.reset();
   };
 
   var onSubmitClick = function (evt) {
+    evt.preventDefault();
+    adForm.noValidate = false;
     var popup = map.querySelector('.popup');
     onRoomChange();
+    roomNumberInput.addEventListener('change', function () {
+      onRoomChange();
+    });
+    guestNumberInput.addEventListener('change', function () {
+      onRoomChange();
+    });
     priceInput.addEventListener('input', onTypeInput);
     priceInput.addEventListener('invalid', onTypeInput);
     if (!priceInput.validity.valid) {
@@ -145,7 +105,6 @@
     userTitleInput.addEventListener('invalid', onTitleInputInvalid);
     userTitleInput.addEventListener('input', onTitleInput);
     if (userTitleInput.checkValidity() && priceInput.checkValidity() && roomNumberInput.checkValidity() && guestNumberInput.checkValidity()) {
-      evt.preventDefault();
       if (popup) {
         window.map.closePopup();
       }
@@ -156,12 +115,8 @@
       window.backend.uploadFunction(new FormData(adForm), showSuccessMessage, window.utils.error);
       window.map.toggleMapFormDisable(true);
       resetForm();
-      unhighlightBorderError(userTitleInput);
-      unhighlightBorderError(priceInput);
-      unhighlightBorderError(guestNumberInput);
       onTypeChange();
       window.map.getMainPinPosition(true);
-      document.addEventListener('keydown', onSuccessEscPress);
       success.addEventListener('click', onSuccessMessageClick);
     }
   };
@@ -180,25 +135,18 @@
       highlightBorderError(userTitleInput);
     } else {
       userTitleInput.setCustomValidity('');
-      if (userTitleInput.style.borderColor === 'red') {
-        unhighlightBorderError(userTitleInput);
-      }
+      unhighlightBorderError(userTitleInput);
     }
   };
 
   var onTitleInput = function (evt) {
     var target = evt.target;
     if (target.value.length < 30) {
-      if (userTitleInput.style.borderColor !== 'red') {
-        highlightBorderError(userTitleInput);
-      }
+      highlightBorderError(userTitleInput);
       target.setCustomValidity('Имя должно состоять минимум из 30-ти символов. Длина имени сейчас: ' + target.value.length);
-
     } else {
       target.setCustomValidity('');
-      if (userTitleInput.style.borderColor === 'red') {
-        unhighlightBorderError(userTitleInput);
-      }
+      unhighlightBorderError(userTitleInput);
     }
   };
 
@@ -210,15 +158,16 @@
 
   var showSuccessMessage = function () {
     success.classList.remove('hidden');
+    document.addEventListener('keydown', onSuccessEscPress);
   };
 
   var onResetClick = function (evt) {
     var popup = map.querySelector('.popup');
     evt.preventDefault();
+    adForm.noValidate = true;
     if (popup) {
       window.map.closePopup();
     }
-    resetForm();
     onTypeChange();
     window.map.toggleMapFormDisable(true);
     var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
@@ -226,10 +175,17 @@
       document.querySelector('.map__pins').removeChild(item);
     });
     window.map.getMainPinPosition(true);
+    reset.removeEventListener('click', onResetClick);
+    roomNumberInput.removeEventListener('change', function () {
+      onRoomChange();
+    });
+    guestNumberInput.removeEventListener('change', function () {
+      onRoomChange();
+    });
     unhighlightBorderError(userTitleInput);
     unhighlightBorderError(priceInput);
     unhighlightBorderError(guestNumberInput);
-    reset.removeEventListener('click', onResetClick);
+    resetForm();
   };
 
   var onSuccessEscPress = function (evt) {
