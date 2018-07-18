@@ -189,10 +189,11 @@
   var onTitleInput = function (evt) {
     var target = evt.target;
     if (target.value.length < 30) {
-      target.setCustomValidity('Имя должно состоять минимум из 30-ти символов');
       if (userTitleInput.style.borderColor !== 'red') {
         highlightBorderError(userTitleInput);
       }
+      target.setCustomValidity('Имя должно состоять минимум из 30-ти символов. Длина имени сейчас: ' + target.value.length);
+
     } else {
       target.setCustomValidity('');
       if (userTitleInput.style.borderColor === 'red') {

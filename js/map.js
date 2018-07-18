@@ -50,6 +50,7 @@
       item.disabled = isDisabled;
     });
     getMainPinPosition(isDisabled);
+    mainPin.addEventListener('mousedown', onMainPinClick);
     if (isDisabled) {
       document.removeEventListener('keydown', window.formValidation.onErrorEsc);
       priceInput.removeEventListener('invalid', window.formValidation.onTypeInput);
