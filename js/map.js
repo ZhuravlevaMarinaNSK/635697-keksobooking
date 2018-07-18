@@ -54,7 +54,8 @@
       document.removeEventListener('keydown', window.formValidation.onErrorEsc);
       priceInput.removeEventListener('invalid', window.formValidation.onTypeInput);
       priceInput.removeEventListener('input', window.formValidation.onTypeInput);
-      userTitleInput.removeEventListener('input', window.formValidation.onTitleInputInvalid);
+      userTitleInput.removeEventListener('invalid', window.formValidation.onTitleInputInvalid);
+      userTitleInput.removeEventListener('input', window.formValidation.onTitleInput);
       typeInput.removeEventListener('change', window.formValidation.onTypeChange);
       timeCheckinInput.removeEventListener('change', window.formValidation.ontimeCheckinChange);
       timeCheckoutInput.removeEventListener('change', window.formValidation.ontimeCheckoutChange);

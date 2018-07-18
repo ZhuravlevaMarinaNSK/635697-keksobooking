@@ -143,6 +143,7 @@
       onTypeInput();
     }
     userTitleInput.addEventListener('invalid', onTitleInputInvalid);
+    userTitleInput.addEventListener('input', onTitleInput);
     if (userTitleInput.checkValidity() && priceInput.checkValidity() && roomNumberInput.checkValidity() && guestNumberInput.checkValidity()) {
       evt.preventDefault();
       if (popup) {
@@ -169,16 +170,34 @@
 
   var onTitleInputInvalid = function () {
     if (userTitleInput.validity.tooShort) {
-      userTitleInput.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
+      userTitleInput.setCustomValidity('Заголовок должен состоять минимум из ' + userTitleInput.minLength + '-ти символов');
       highlightBorderError(userTitleInput);
     } else if (userTitleInput.validity.tooLong) {
-      userTitleInput.setCustomValidity('Заголовок не должен превышать 100 символов');
+      userTitleInput.setCustomValidity('Заголовок не должен превышать ' + userTitleInput.maxLength + ' символов');
       highlightBorderError(userTitleInput);
     } else if (userTitleInput.validity.valueMissing) {
       userTitleInput.setCustomValidity('Обязательное поле');
       highlightBorderError(userTitleInput);
     } else {
       userTitleInput.setCustomValidity('');
+      if (userTitleInput.style.borderColor === 'red') {
+        unhighlightBorderError(userTitleInput);
+      }
+    }
+  };
+
+  var onTitleInput = function (evt) {
+    var target = evt.target;
+    if (target.value.length < 30) {
+      target.setCustomValidity('Имя должно состоять минимум из 30-ти символов');
+      if (userTitleInput.style.borderColor !== 'red') {
+        highlightBorderError(userTitleInput);
+      }
+    } else {
+      target.setCustomValidity('');
+      if (userTitleInput.style.borderColor === 'red') {
+        unhighlightBorderError(userTitleInput);
+      }
     }
   };
 
@@ -230,6 +249,7 @@
     ontimeCheckinChange: ontimeCheckinChange,
     ontimeCheckoutChange: ontimeCheckoutChange,
     onSubmitClick: onSubmitClick,
+    onTitleInput: onTitleInput,
     onErrorEsc: onErrorEsc,
     onResetClick: onResetClick,
     onTypeChange: onTypeChange,
