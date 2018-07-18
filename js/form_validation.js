@@ -248,12 +248,12 @@
   window.formValidation = {
     onTypeInput: onTypeInput,
     ontimeCheckinChange: ontimeCheckinChange,
+    onTitleInputInvalid: onTitleInputInvalid,
     ontimeCheckoutChange: ontimeCheckoutChange,
     onSubmitClick: onSubmitClick,
     onTitleInput: onTitleInput,
     onErrorEsc: onErrorEsc,
     onResetClick: onResetClick,
-    onTypeChange: onTypeChange,
-    onTitleInputInvalid: onTitleInputInvalid
+    onTypeChange: onTypeChange
   };
 })();
