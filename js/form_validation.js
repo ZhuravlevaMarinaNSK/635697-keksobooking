@@ -5,9 +5,7 @@
   var roomNumberInput = adForm.querySelector('#room_number');
   var priceInput = adForm.querySelector('#price');
   var typeInput = adForm.querySelector('#type');
-  var formInputs = adForm.querySelectorAll('select, input, checkbox, textarea');
   var guestNumberInput = adForm.querySelector('#capacity');
-  var addressInput = adForm.querySelector('#address');
   var map = document.querySelector('.map');
   var avatar = adForm.querySelector('.ad-form-header__preview img');
   var containerPhoto = adForm.querySelector('.ad-form__photo-container');
@@ -86,7 +84,7 @@
     adForm.reset();
   };
 
-  var onSubmitClick = function (evt) {;
+  var onSubmitClick = function (evt) {
     evt.preventDefault();
     adForm.noValidate = false;
 
@@ -158,12 +156,13 @@
 
   var showSuccessMessage = function () {
     success.classList.remove('hidden');
-    success.addEventListener('click', onSuccessMessageClick)
+    success.addEventListener('click', onSuccessMessageClick);
     document.documentElement.focus();
-    document.addEventListener('keydown', onSuccessEscPress, false);
+    document.addEventListener('keydown', onSuccessEscPress);
   };
 
   var onResetClick = function (evt) {
+    resetForm();
     var popup = map.querySelector('.popup');
     evt.preventDefault();
     adForm.noValidate = true;
@@ -187,7 +186,6 @@
     unhighlightBorderError(userTitleInput);
     unhighlightBorderError(priceInput);
     unhighlightBorderError(guestNumberInput);
-    resetForm();
   };
 
   var onSuccessEscPress = function (evt) {
