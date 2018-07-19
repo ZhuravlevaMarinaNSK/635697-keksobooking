@@ -13,9 +13,6 @@
   var ENTER_KEYCODE = 13;
   var MAIN_PIN_TAIL = 22;
   var DEBOUNCE_INTERVAL = 300;
-  var TOP_EDGE = 130;
-  var BOTTOM_EDGE = 630;
-  var LEFT_EDGE = 0;
 
   var GUEST_ROOMS = {
     1: [1],
@@ -24,7 +21,7 @@
     100: [0]
   };
 
-  var errorHandler = function (errorMessage) {
+  var onError = function (errorMessage) {
     var node = document.createElement('div');
     node.style = 'z-index: 100; padding: 50px 10px; margin: 0 auto; text-align: center; vertical-align: middle; background-color: #da641a; border: 15px dashed white';
     node.style.position = 'absolute';
@@ -38,6 +35,9 @@
 
     node.textContent = 'Что-то пошло не так ¯\_(ツ)_/¯ ' + errorMessage;
     document.body.insertAdjacentElement('afterbegin', node);
+    setTimeout(function () {
+      node.classList.add('hidden');
+    }, 5000);
   };
 
   var debounce = function (fun) {
@@ -62,28 +62,11 @@
     numberOfAds: NUMBER_OF_ADS,
     pinHeight: PIN_HEIGHT,
     pinWidth: PIN_WIDTH,
-    top: TOP_EDGE,
-    bottom: BOTTOM_EDGE,
-    left: LEFT_EDGE,
     escKeycode: ESC_KEYCODE,
     enterKeycode: ENTER_KEYCODE,
     mainPinTail: MAIN_PIN_TAIL,
     guestRooms: GUEST_ROOMS,
-    error: errorHandler,
-    debounce: debounce,
-    getRandom: function (min, max) {
-      return Math.floor(Math.random() * (max + 1 - min) + min);
-    },
-    getShuffle: function (array) {
-      var counter = array.length;
-      while (counter > 0) {
-        var index = Math.floor(Math.random() * counter);
-        counter--;
-        var temp = array[counter];
-        array[counter] = array[index];
-        array[index] = temp;
-      }
-      return array;
-    }
+    error: onError,
+    debounce: debounce
   };
 })();

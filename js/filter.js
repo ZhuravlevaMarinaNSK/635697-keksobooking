@@ -30,7 +30,7 @@
     }
   };
 
-  var checkPricefield = function (item, name) {
+  var checkPriceField = function (item, name) {
     var value = getInfo(name);
     if (value !== anyValue) {
       switch (value) {
@@ -48,7 +48,7 @@
     }
   };
 
-  var checkFeaturesfield = function (item) {
+  var checkFeaturesField = function (item) {
     var features = filter.querySelectorAll('input:checked');
     var result;
     if (features.length > 0) {
@@ -64,8 +64,11 @@
     return result;
   };
 
-  var sortPins = function (it) {
-    return checkDataField(it, 'type') && checkDataField(it, 'guests') && checkDataField(it, 'rooms') && checkPricefield(it, 'price') && checkFeaturesfield(it);
+  var sortPins = function (pins) {
+    var pinsData = pins.filter(function (it) {
+      return checkDataField(it, 'type') && checkDataField(it, 'guests') && checkDataField(it, 'rooms') && checkPriceField(it, 'price') && checkFeaturesField(it);
+    });
+    return pinsData;
   };
 
   window.filter = {

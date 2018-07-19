@@ -1,14 +1,16 @@
 'use strict';
 
 (function () {
-  var roomNumberInput = document.querySelector('#room_number');
   var adForm = document.querySelector('.ad-form');
+  var roomNumberInput = adForm.querySelector('#room_number');
   var priceInput = adForm.querySelector('#price');
   var typeInput = adForm.querySelector('#type');
-  var formInputs = adForm.querySelectorAll('select, input, checkbox, textarea');
   var guestNumberInput = adForm.querySelector('#capacity');
-  var mainPin = document.querySelector('.map__pin--main');
   var map = document.querySelector('.map');
+  var avatar = adForm.querySelector('.ad-form-header__preview img');
+  var containerPhoto = adForm.querySelector('.ad-form__photo-container');
+  var previewPhoto = containerPhoto.querySelector('.ad-form__photo');
+  var reset = adForm.querySelector('.ad-form__reset');
 
   var onTypeChange = function () {
     switch (typeInput.value) {
@@ -36,11 +38,15 @@
   };
 
   var highlightBorderError = function (element) {
-    element.style.borderColor = 'red';
+    if (element.style.borderColor !== 'red') {
+      element.style.borderColor = 'red';
+    }
   };
 
   var unhighlightBorderError = function (element) {
-    element.style.borderColor = '#d9d9d3';
+    if (element.style.borderColor === 'red') {
+      element.style.borderColor = '';
+    }
   };
 
   var onRoomChange = function () {
@@ -53,14 +59,6 @@
       unhighlightBorderError(guestNumberInput);
     }
   };
-
-  roomNumberInput.addEventListener('change', function () {
-    onRoomChange();
-  });
-
-  guestNumberInput.addEventListener('change', function () {
-    onRoomChange();
-  });
 
   var timeCheckinInput = document.querySelector('#timein');
   var timeCheckoutInput = document.querySelector('#timeout');
@@ -78,46 +76,46 @@
   success.classList.add('hidden');
 
   var resetForm = function () {
-    for (var i = 0; i < formInputs.length; i++) {
-      var fieldType = formInputs[i].type.toLowerCase();
-      switch (fieldType) {
-        case 'text':
-        case 'textarea':
-        case 'number':
-        case 'file':
-          formInputs[i].value = '';
-          break;
-        case 'checkbox':
-          if (formInputs[i].checked) {
-            formInputs[i].checked = false;
-          }
-          break;
-        case 'select-one':
-        case 'select-multi':
-          formInputs[i].selectedIndex = 0;
-          break;
-        default:
-          break;
-      }
+    avatar.src = 'img/muffin-grey.svg';
+    while (containerPhoto.lastChild.tagName === 'IMG') {
+      containerPhoto.removeChild(containerPhoto.lastChild);
     }
-    typeInput.selectedIndex = 1;
+    previewPhoto.classList.remove('visually-hidden');
+    adForm.reset();
   };
 
   var onSubmitClick = function (evt) {
+    evt.preventDefault();
+    adForm.noValidate = false;
+
+    var popup = map.querySelector('.popup');
     onRoomChange();
+    roomNumberInput.addEventListener('change', function () {
+      onRoomChange();
+    });
+    guestNumberInput.addEventListener('change', function () {
+      onRoomChange();
+    });
+    priceInput.addEventListener('input', onTypeInput);
+    priceInput.addEventListener('invalid', onTypeInput);
+    if (!priceInput.validity.valid) {
+      onTypeInput();
+    }
+    userTitleInput.addEventListener('invalid', onTitleInputInvalid);
+    userTitleInput.addEventListener('input', onTitleInput);
     if (userTitleInput.checkValidity() && priceInput.checkValidity() && roomNumberInput.checkValidity() && guestNumberInput.checkValidity()) {
-      evt.preventDefault();
-      window.map.toggleMapFormDisable(true);
+      if (popup) {
+        window.map.closePopup();
+      }
       var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
       pinsForDelete.forEach(function (item) {
         document.querySelector('.map__pins').removeChild(item);
       });
-      resetForm();
-      window.map.getMainPinPosition(true);
-      mainPin.addEventListener('mouseup', window.map.onMainPinClick);
-      document.addEventListener('keydown', onSuccessEscPress);
-      success.addEventListener('click', onSuccessMessageClick);
       window.backend.uploadFunction(new FormData(adForm), showSuccessMessage, window.utils.error);
+      window.map.toggleMapFormDisable(true);
+      resetForm();
+      onTypeChange();
+      window.map.getMainPinPosition(true);
     }
   };
 
@@ -125,10 +123,10 @@
 
   var onTitleInputInvalid = function () {
     if (userTitleInput.validity.tooShort) {
-      userTitleInput.setCustomValidity('Заголовок должен состоять минимум из 30-ти символов');
+      userTitleInput.setCustomValidity('Заголовок должен состоять минимум из ' + userTitleInput.minLength + '-ти символов');
       highlightBorderError(userTitleInput);
     } else if (userTitleInput.validity.tooLong) {
-      userTitleInput.setCustomValidity('Заголовок не должен превышать 100 символов');
+      userTitleInput.setCustomValidity('Заголовок не должен превышать ' + userTitleInput.maxLength + ' символов');
       highlightBorderError(userTitleInput);
     } else if (userTitleInput.validity.valueMissing) {
       userTitleInput.setCustomValidity('Обязательное поле');
@@ -137,13 +135,13 @@
       userTitleInput.setCustomValidity('');
       unhighlightBorderError(userTitleInput);
     }
-    userTitleInput.addEventListener('invalid', onTitleInputInvalid);
   };
 
   var onTitleInput = function (evt) {
     var target = evt.target;
-    if (target.value.length < 5) {
-      target.setCustomValidity('Имя должно состоять минимум из 5-ти символов');
+    if (target.value.length < 30) {
+      highlightBorderError(userTitleInput);
+      target.setCustomValidity('Имя должно состоять минимум из 30-ти символов. Длина имени сейчас: ' + target.value.length);
     } else {
       target.setCustomValidity('');
       unhighlightBorderError(userTitleInput);
@@ -158,46 +156,60 @@
 
   var showSuccessMessage = function () {
     success.classList.remove('hidden');
+    success.addEventListener('click', onSuccessMessageClick);
+    document.documentElement.focus();
+    document.addEventListener('keydown', onSuccessEscPress);
   };
 
-  var onResetClick = function () {
+  var onResetClick = function (evt) {
+    resetForm();
     var popup = map.querySelector('.popup');
+    evt.preventDefault();
+    adForm.noValidate = true;
     if (popup) {
       window.map.closePopup();
     }
+    onTypeChange();
     window.map.toggleMapFormDisable(true);
     var pinsForDelete = map.querySelectorAll('.map__pin:not(.map__pin--main)');
     pinsForDelete.forEach(function (item) {
       document.querySelector('.map__pins').removeChild(item);
     });
-    resetForm();
     window.map.getMainPinPosition(true);
-    mainPin.addEventListener('mousedown', window.map.onMainPinClick);
+    reset.removeEventListener('click', onResetClick);
+    roomNumberInput.removeEventListener('change', function () {
+      onRoomChange();
+    });
+    guestNumberInput.removeEventListener('change', function () {
+      onRoomChange();
+    });
+    unhighlightBorderError(userTitleInput);
+    unhighlightBorderError(priceInput);
+    unhighlightBorderError(guestNumberInput);
   };
 
   var onSuccessEscPress = function (evt) {
-    if (evt.keyCode === window.utils.esqKeycode) {
+    if (evt.keyCode === window.utils.escKeycode) {
       onSuccessMessageClick();
     }
   };
 
-  var onErrorEsq = function (evt) {
+  var onErrorEsc = function (evt) {
     var error = document.querySelector('.error-message');
     if (error && evt.keyCode === window.utils.escKeycode) {
       error.parentNode.removeChild(error);
     }
   };
 
-  document.addEventListener('keydown', onErrorEsq);
-
   window.formValidation = {
     onTypeInput: onTypeInput,
     ontimeCheckinChange: ontimeCheckinChange,
+    onTitleInputInvalid: onTitleInputInvalid,
     ontimeCheckoutChange: ontimeCheckoutChange,
     onSubmitClick: onSubmitClick,
-    onResetClick: onResetClick,
     onTitleInput: onTitleInput,
-    onTypeChange: onTypeChange,
-    onTitleInputInvalid: onTitleInputInvalid
+    onErrorEsc: onErrorEsc,
+    onResetClick: onResetClick,
+    onTypeChange: onTypeChange
   };
 })();

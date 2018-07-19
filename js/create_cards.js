@@ -29,6 +29,28 @@
     return fragment;
   };
 
+  var desactivatePin = function () {
+    var allPins = document.querySelectorAll('.map__pin');
+    allPins.forEach(function (it) {
+      if (it.classList.contains('map__pin--active')) {
+        it.classList.remove('map__pin--active');
+      }
+    });
+  };
+
+  var onPinClick = function (evt) {
+    var target;
+    if (evt.target.tagName === 'BUTTON' && evt.target !== document.querySelector('.popup__close') && evt.target !== document.querySelector('.map__pin--main')) {
+      target = evt.target;
+    } else if (evt.target.parentNode.tagName === 'BUTTON' && evt.target.parentNode !== document.querySelector('.map__pin--main')) {
+      target = evt.target.parentNode;
+    }
+    if (target) {
+      desactivatePin();
+      target.classList.add('map__pin--active');
+    }
+  };
+
   var renderPin = function (ad) {
     var adElement = similarPopupTemplate.querySelector('.map__pin').cloneNode(true);
 
@@ -39,21 +61,17 @@
     adElement.querySelector('img').setAttribute('alt', ad.offer.title);
     adElement.addEventListener('click', function () {
       window.map.showCard(document.querySelector('.map'), ad);
+      document.addEventListener('click', onPinClick);
     });
     return adElement;
   };
 
-  var createPins = function (ads) {
+  var createPin = function (ads) {
     var fragmentPin = document.createDocumentFragment();
-    if (ads.length > 0 && ads.length > 5) {
-      for (var i = 0; i < 5; i++) {
-        fragmentPin.appendChild(renderPin(ads[i]));
-      }
-    } else if (ads.length > 0 && ads.length < 5) {
-      ads.forEach(function (item) {
-        fragmentPin.appendChild(renderPin(item));
-      });
-    }
+    var arr = ads.slice(0, 4);
+    arr.forEach(function (item) {
+      fragmentPin.appendChild(renderPin(item));
+    });
     document.querySelector('.map__pins').appendChild(fragmentPin);
     return;
   };
@@ -64,16 +82,22 @@
     allPins.forEach(function (item) {
       mapPins.removeChild(item);
     });
+    document.removeEventListener('click', onPinClick);
   };
 
-  var getHomeType = function (homeType) {
-    var homeTypes = {
-      'flat': 'Квартира',
-      'palace': 'Дворец',
-      'house': 'Дом',
-      'bungalo': 'Бунгало'
-    };
-    return (homeTypes[homeType]);
+  var homeType = {
+    'flat': 'Квартира',
+    'palace': 'Дворец',
+    'house': 'Дом',
+    'bungalo': 'Бунгало'
+  };
+
+  var getHomeType = function (types) {
+    return (homeType[types]);
+  };
+
+  var checkEmptiness = function (item, block, action) {
+    return item.length !== 0 ? block.appendChild(action(item)) : block.classList.add('visually-hidden');
   };
 
   var renderAd = function (ad) {
@@ -93,15 +117,18 @@
 
     photosBlock.innerText = '';
     featuresBlock.innerText = '';
-    featuresBlock.appendChild(renderFeatureList(ad.offer.features));
-    photosBlock.appendChild(renderPhotoList(ad.offer.photos));
+
+    checkEmptiness(ad.offer.features, featuresBlock, renderFeatureList);
+    checkEmptiness(ad.offer.photos, photosBlock, renderPhotoList);
+
     adElement.querySelector('.popup__description').textContent = ad.offer.description;
     return adElement;
   };
 
   window.createCards = {
-    createPins: createPins,
+    createPins: createPin,
     renderAd: renderAd,
-    removePins: removePins
+    removePins: removePins,
+    desactivatePin: desactivatePin
   };
 })();

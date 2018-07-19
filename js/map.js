@@ -4,7 +4,7 @@
   var MAIN_PIN_LEFT = 570;
   var MAIN_PIN_TOP = 375;
   var map = document.querySelector('.map');
-  var allFilters = map.querySelector('.map__filters');
+  var filterForm = map.querySelector('.map__filters');
   var adForm = document.querySelector('.ad-form');
   var mainPin = map.querySelector('.map__pin--main');
   var adFormFieldsets = adForm.querySelectorAll('fieldset');
@@ -22,9 +22,9 @@
     if (isDisabled) {
       k = 0;
     }
-    var top = mainPin.offsetTop + window.utils.pinHeight / 2 + (window.utils.pinHeight / 2 + window.utils.mainPinTail) * k;
+    var top = mainPin.offsetTop + window.utils.pinHeight / 2 + (window.utils.pinHeight * 2 + window.utils.mainPinTail) * k;
     var left = mainPin.offsetLeft + window.utils.pinWidth / 2;
-    var coordinates = top + ', ' + left;
+    var coordinates = left + ', ' + top;
     adForm.querySelector('#address').value = coordinates;
   };
 
@@ -46,21 +46,25 @@
   var toggleMapFormDisable = function (isDisabled) {
     map.classList.toggle('map--faded', isDisabled);
     adForm.classList.toggle('ad-form--disabled', isDisabled);
-
-    for (var k = 0; k < adFormFieldsets.length; k++) {
-      adFormFieldsets[k].disabled = isDisabled;
-    }
-
+    adFormFieldsets.forEach(function (item) {
+      item.disabled = isDisabled;
+    });
     getMainPinPosition(isDisabled);
-    mainPin.removeEventListener('mouseup', onMainPinClick);
-    priceInput.removeEventListener('invalid', window.formValidation.onTypeInput);
-    userTitleInput.removeEventListener('input', window.formValidation.onTitleInputInvalid);
-    typeInput.removeEventListener('change', window.formValidation.onTypeChange);
-    timeCheckinInput.removeEventListener('change', window.formValidation.ontimeCheckinChange);
-    timeCheckoutInput.removeEventListener('change', window.formValidation.ontimeCheckoutChange);
-    submit.removeEventListener('click', window.formValidation.onSubmitClick);
-    userTitleInput.removeEventListener('input', window.formValidation.onTitleInput);
-    setAnyForm();
+    mainPin.addEventListener('mousedown', onMainPinClick);
+    mainPin.addEventListener('keydown', onMainPinEnter);
+    if (isDisabled) {
+      document.removeEventListener('keydown', window.formValidation.onErrorEsc);
+      priceInput.removeEventListener('invalid', window.formValidation.onTypeInput);
+      priceInput.removeEventListener('input', window.formValidation.onTypeInput);
+      userTitleInput.removeEventListener('invalid', window.formValidation.onTitleInputInvalid);
+      userTitleInput.removeEventListener('input', window.formValidation.onTitleInput);
+      typeInput.removeEventListener('change', window.formValidation.onTypeChange);
+      timeCheckinInput.removeEventListener('change', window.formValidation.ontimeCheckinChange);
+      timeCheckoutInput.removeEventListener('change', window.formValidation.ontimeCheckoutChange);
+      submit.removeEventListener('click', window.formValidation.onSubmitClick);
+      filterForm.removeEventListener('change', onChangeFilter);
+      setAnyForm();
+    }
     mainPin.style.left = MAIN_PIN_LEFT + 'px';
     mainPin.style.top = MAIN_PIN_TOP + 'px';
   };
@@ -69,25 +73,31 @@
 
   var onMainPinClick = function () {
     toggleMapFormDisable(false);
-    window.backend.loadFunction(getData, window.utils.error);
+    window.backend.loadFunction(getData);
     window.backend.loadFunction(window.createCards.createPins, window.utils.error);
     mainPin.removeEventListener('mousedown', onMainPinClick);
-    window.formValidation.onTypeChange();
-    reset.addEventListener('click', window.formValidation.onResetClick);
-    priceInput.addEventListener('invalid', window.formValidation.onTypeInput);
-    priceInput.addEventListener('input', window.formValidation.onTypeInput);
+    mainPin.removeEventListener('keydown', onMainPinEnter);
     typeInput.addEventListener('change', window.formValidation.onTypeChange);
-
-    userTitleInput.addEventListener('invalid', window.formValidation.onTitleInputInvalid);
-    userTitleInput.addEventListener('input', window.formValidation.onTitleInput);
+    window.formValidation.onTypeChange();
+    document.addEventListener('keydown', window.formValidation.onErrorEsc);
+    reset.addEventListener('click', window.formValidation.onResetClick);
+    typeInput.addEventListener('change', window.formValidation.onTypeChange);
     timeCheckinInput.addEventListener('change', window.formValidation.ontimeCheckinChange);
     timeCheckoutInput.addEventListener('change', window.formValidation.ontimeCheckoutChange);
     submit.addEventListener('click', window.formValidation.onSubmitClick);
-    allFilters.addEventListener('change', onChangeFilter);
+    filterForm.addEventListener('change', onChangeFilter);
     disableForm(true);
   };
 
   mainPin.addEventListener('mousedown', onMainPinClick);
+
+  var onMainPinEnter = function (evt) {
+    if (evt.keyCode === window.utils.enterKeycode) {
+      onMainPinClick();
+    }
+  };
+
+  mainPin.addEventListener('keydown', onMainPinEnter);
 
   var onPopupCloseEnterPress = function (evt) {
     if (evt.keyCode === window.utils.enterKeycode) {
@@ -105,6 +115,7 @@
     var popup = map.querySelector('.popup');
     var popupClose = document.querySelector('.popup__close');
     map.removeChild(popup);
+    window.createCards.desactivatePin();
     document.removeEventListener('keydown', onPopupEscPress);
     popupClose.removeEventListener('click', closePopup);
     popupClose.removeEventListener('keydown', onPopupCloseEnterPress);
@@ -128,7 +139,7 @@
       closePopup();
     }
     window.createCards.removePins();
-    var pinsData = pins.filter(window.filter.sortPins);
+    var pinsData = window.filter.sortPins(pins);
     window.createCards.createPins(pinsData);
   };
 
@@ -143,7 +154,7 @@
   };
 
   var disableForm = function (isDisabled) {
-    var inputs = allFilters.querySelectorAll('input, select');
+    var inputs = filterForm.querySelectorAll('input, select');
     inputs.forEach(function (item) {
       item.disabled = isDisabled;
     });
@@ -151,8 +162,8 @@
 
   window.map = {
     toggleMapFormDisable: toggleMapFormDisable,
-    onMainPinClick: onMainPinClick,
     getMainPinPosition: getMainPinPosition,
+    onMainPinClick: onMainPinClick,
     closePopup: closePopup,
     showCard: showCard,
     pins: pins
