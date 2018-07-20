@@ -18,11 +18,11 @@
   var pins = [];
 
   var getMainPinPosition = function (isDisabled) {
-    var k = 1;
+    var disability = 1;
     if (isDisabled) {
-      k = 0;
+      disability = 0;
     }
-    var top = mainPin.offsetTop + window.utils.pinHeight / 2 + (window.utils.pinHeight * 2 + window.utils.mainPinTail) * k;
+    var top = mainPin.offsetTop + window.utils.pinHeight / 2 + (window.utils.pinHeight * 2 + window.utils.mainPinTail) * disability;
     var left = mainPin.offsetLeft + window.utils.pinWidth / 2;
     var coordinates = left + ', ' + top;
     adForm.querySelector('#address').value = coordinates;

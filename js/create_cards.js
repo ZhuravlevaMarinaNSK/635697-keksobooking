@@ -68,7 +68,7 @@
 
   var createPin = function (ads) {
     var fragmentPin = document.createDocumentFragment();
-    var arr = ads.slice(0, 4);
+    var arr = ads.slice(0, 5);
     arr.forEach(function (item) {
       fragmentPin.appendChild(renderPin(item));
     });

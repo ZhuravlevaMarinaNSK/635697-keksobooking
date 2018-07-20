@@ -13,6 +13,7 @@
   var ENTER_KEYCODE = 13;
   var MAIN_PIN_TAIL = 22;
   var DEBOUNCE_INTERVAL = 300;
+  var TIMEOUT = 5000;
 
   var GUEST_ROOMS = {
     1: [1],
@@ -37,7 +38,7 @@
     document.body.insertAdjacentElement('afterbegin', node);
     setTimeout(function () {
       node.classList.add('hidden');
-    }, 5000);
+    }, TIMEOUT);
   };
 
   var debounce = function (fun) {
