@@ -73,8 +73,7 @@
 
   var onMainPinClick = function () {
     toggleMapFormDisable(false);
-    window.backend.loadFunction(getData);
-    window.backend.loadFunction(window.createCards.createPins, window.utils.error);
+    window.backend.loadFunction(getDataFromServer, window.utils.error);
     mainPin.removeEventListener('mousedown', onMainPinClick);
     mainPin.removeEventListener('keydown', onMainPinEnter);
     typeInput.addEventListener('change', window.formValidation.onTypeChange);
@@ -147,9 +146,10 @@
     updatePins();
   });
 
-  var getData = function (info) {
+  var getDataFromServer = function (info) {
     pins = info.slice();
     disableForm(false);
+    window.createCards.createPins(pins);
     return pins;
   };
 
