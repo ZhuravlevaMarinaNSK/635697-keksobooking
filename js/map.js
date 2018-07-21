@@ -147,7 +147,7 @@
   });
 
   var getDataFromServer = function (info) {
-    pins = info.slice();
+    pins = info;
     disableForm(false);
     window.createCards.createPins(pins);
     return pins;
